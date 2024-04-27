@@ -142,6 +142,15 @@ Java的体系结构
 
 <img src="JVM.Images.I/第01章_Java_Conceptual_Diagram.png" width="800">
 
+JDK是用于支持Java程序开发的最小环境，包含以下三个部分
+1. Java虚拟机 (最底层的基础)
+2. Java程序设计语言
+3. Java类库
+
+JRE包含以下两个部分:
+1. Java SE API: [Java® Platform, Standard Edition & Java Development Kit
+   Version 17 API Specification](https://docs.oracle.com/en/java/javase/17/docs/api/index.html)
+2. Java虚拟机
 
 ## 6. JVM的整体结构
 * HotSpot VM是目前市面上高性能JVM的代表作之一。它采用**解释器**与**即时编译器**并存的架构。
