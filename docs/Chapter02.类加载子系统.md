@@ -228,3 +228,4 @@ Java程序对类的使用方式分为: 主动使用和被动使用。
 * [是龙弟弟呀: 第2章--类加载子系统](https://zhuanlan.zhihu.com/p/268574484)
 * [Java类加载器的底层原理](https://segmentfault.com/a/1190000037678946)
 * [双亲委派机制](https://victorfengming.gitee.io/about_jvm/31_%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%9C%BA%E5%88%B6.html)
+* [Java 类加载机制 - 类加载的时机和过程](https://www.bytelife.net/articles/49511.html)
