@@ -11,8 +11,12 @@
     <groupId>com</groupId>
     <artifactId>JVMTutorial</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>JVMTutorial</name>
     <description>JVMTutorial</description>
+    <modules>
+        <module>Chapter04</module>
+    </modules>
     <properties>
         <java.version>17</java.version>
     </properties>
