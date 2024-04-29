@@ -16,6 +16,7 @@
     <description>JVMTutorial</description>
     <modules>
         <module>Chapter04</module>
+        <module>Chapter05</module>
     </modules>
     <properties>
         <java.version>17</java.version>
