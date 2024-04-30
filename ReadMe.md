@@ -35,6 +35,7 @@
 * [沉默王二: 2024年最值得收藏的JVM学习路线](https://javabetter.cn/xuexiluxian/java/jvm.html)
 * [Medium: Understanding JVM Architecture](https://medium.com/platform-engineer/understanding-jvm-architecture-22c0ddf09722)
 * [20张图助你了解JVM运行时数据区，你还觉得枯燥吗？](https://cloud.tencent.com/developer/article/1823397)
+* [哲雪君！: JVM学习笔记](https://www.cnblogs.com/zhexuejun/category/2045472.html)
 
 
 ## Initialize Repository and Setup
