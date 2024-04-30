@@ -34,6 +34,7 @@
 * [沉默王二: 二哥的Java进阶之路x沉默王二](https://javabetter.cn/home.html#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E6%9C%89%E8%BF%99%E4%B8%AA%E5%BC%80%E6%BA%90%E7%9F%A5%E8%AF%86%E5%BA%93)
 * [沉默王二: 2024年最值得收藏的JVM学习路线](https://javabetter.cn/xuexiluxian/java/jvm.html)
 * [Medium: Understanding JVM Architecture](https://medium.com/platform-engineer/understanding-jvm-architecture-22c0ddf09722)
+* [20张图助你了解JVM运行时数据区，你还觉得枯燥吗？](https://cloud.tencent.com/developer/article/1823397)
 
 
 ## Initialize Repository and Setup
