@@ -209,8 +209,32 @@ public class OperandStackTest {
 程序员面试中，常见的`i++`和`++i`的区别，放到字节码篇章中再介绍。
 
 
-## 6 栈顶缓存技术
-## 7 动态链接
+## 6. 栈顶缓存技术
+基于栈式架构的虚拟机所使用的零地址指令更加紧凑，但完成一项操作的时候需要使用更多的入栈和出栈指令，这同时也就意味着需要将更多的指令分派(instruction dispatch)次数和内存读/写次数。
+
+由于操作数是存储在内存中的，因此频繁地执行内存读/写操作必然会影响执行速度。为了解决这个问题，HotSpot JVM的设计者们提出了栈顶缓存(ToS, Top-of-Stack Caching)技术，将栈顶元素全部缓存在物理CPU的寄存器中，以此降低对内存的读/写次数，提高执行引擎的执行效率。
+
+* 寄存器: 指令更少，执行速度快
+
+
+## 7. 动态链接(Dynamic Linking)(或指向运行时常量池的方法引用)
+注: 有些书上也会将动态链接，方法返回地址，和一些附加信息统称为"帧数据区"。
+
+<img src="JVM.Images.I/第05章_动态链接.png">
+
+class文件中存在一个常量池表(Constant Pool Table)，存了编译后各种字面量的符号引用，其中，方法之间的调用也被表示成符号引用，这种符号引用类加载或者程序执行期间转为直接引用，程序执行期间方法调用从符号引用转为直接引用就是动态链接(Dynamic Linking)。为了支持动态链接实现，每一个栈帧中都有一个执行运行时常量池中该栈帧所属方法的引用。所以想要理解动态链接，就首先要了解虚拟机中是如何进行方法调用的。
+
+* 每一个栈帧内部都包含一个指向**运行时常量池**中该栈帧所属方法的引用。包含这个引用的目的就是为了支持当前方法的代码能够实现动态链接(Dynamic Linking)。比如: `invokedynamic`指令。
+* 在Java源文件被编译到字节码文件中时，所有的变量和方法引用都作为符号引用(Symbolic Reference)保存在class文件的常量池中。比如: 描述一个方法调用了另外的其他方法时，就是通过常量池中指向方法的符号引用来表示的，那么动态链接的作用就是为了将这些符号引用转换为调用方法的直接引用。
+
+<img src="JVM.Images.I/第05章_动态链接_常量池_1.png">
+<img src="JVM.Images.I/第05章_动态链接_常量池_2.png">
+<img src="JVM.Images.I/第05章_动态链接_常量池_3.png">
+
+为什么需要运行时常量池？
+* 字节码文件中需要很多数据的支持，但数据很大，不能直接保存到字节码文件中，所以常量池的作用就是为了提供一些符号和常量，便于指令的识别。
+
+
 ## 8 方法的调用: 解析与分派
 ## 9 方法返回地址
 ## 10 一些附加信息
@@ -229,5 +253,7 @@ public class OperandStackTest {
 * [第六篇 JVM之运行时数据区<2>: 虚拟机栈](https://www.cnblogs.com/zhexuejun/p/15480505.html)
 * [第七篇 JVM之运行时数据区<3>: 局部变量表](https://www.cnblogs.com/zhexuejun/p/15498915.html)
 * [第八篇 JVM之运行时数据区<4>: 操作数栈](https://www.cnblogs.com/zhexuejun/p/15509161.html)
+* [第九篇 JVM之运行时数据区<5>: 动态链接](https://www.cnblogs.com/zhexuejun/p/15586428.html)
+* [3.动态链接（Dynamic Linking【指向运行时常量池的方法引用】）](https://www.cnblogs.com/Timeouting-Study/p/12511969.html)
 * :white_check_mark: [Java虚拟机—栈帧、操作数栈和局部变量表](https://zhuanlan.zhihu.com/p/45354152)
 * [JVM-栈帧之局部变量表](https://www.cnblogs.com/niulongwei/p/14864516.html)
