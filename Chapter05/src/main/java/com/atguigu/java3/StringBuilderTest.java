@@ -23,6 +23,7 @@ public class StringBuilderTest {
         //...
     }
     //sBuilder的操作过程：是线程不安全的
+    // sBuilder是共享数据，可能被多个线程共同操作
     public static void method2(StringBuilder sBuilder){
         sBuilder.append("a");
         sBuilder.append("b");
