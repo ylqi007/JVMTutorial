@@ -48,8 +48,64 @@ Example: `com.atguigu.java.HeapDemo`
 <img src="JVM.Images.I/第08章_VisualGC_新生代_老年代.png">
 
 ## 8.2 设置堆内存大小与OOM
+* Java堆区用于存储Java对象实例，那么堆的大小在JVM启动时就已经设定好了，大家可以通过选项`-Xmx`和`-Xms`来进行设置。
+  * `-Xms`用于表示堆区的起始内存，等价于`-XX:InitialHeapSize`
+  * `-Xmx`用于表示堆区的最大内存，等价于`-XX:MaxHeapSize`
+  * `-Xmn`用于设置年轻代内存，一般不用，而是用`-XX:NewRatio`
+* 一旦堆区中的内存大小超过`-Xmx`所指定的最大内存时，将会抛出`OutOfMemoryError`异常。
+* 通常会将`-Xms`和`-Xmx`两个参数配置相同的值，其目的是为了能够在Java垃圾回收机制清理完堆区后，不需要再重新分隔计算堆区的大小，从而提高性能。
+* 默认情况下: 
+  * 初始内存大小: 物理内存大小/64
+  * 最大内存大小: 物理内存大小/4
+
+<img src="JVM.Images.I/第08章_OOMTest.png">
 
 ## 8.3 年轻代与老年代
+* 存储在JVM中的Java对象可以划分为两类：
+  * 一类是生命周期比较短的瞬时对象，这类对象的创建和消亡都非常迅速。
+  * 另一类对象的生命周期却非常长，在某些极端的情况下还能够与JVM的生命周期保持一致。
+* Java堆区进一步细分的话，可以划分为年轻代(YoungGen)和老年代(OldGen)。
+* 其中年轻代又可以划分为Eden空间、Survivor0空间和Survivor1空间(有时也叫做from区和to区)
+* <img src="JVM.Images.I/第08章_堆空间细节.jpg">
+* 1. 伊甸区(Eden): 存放大部分新创建对象。
+  2. 幸存区(Survivor): 存放Minor GC之后，Eden区和幸存区(Survivor)本身没有被回收的对象。
+  3. 老年区: 存放Minor GC之后且年龄计算器达到15依然存活的对象、Major GC和Full GC之后仍然存活的对象。
+* 在HotSpot中，Eden空间和另外两个Survivor空间缺省所占比例是8:1:1
+* 当然，开发人员可以通过选项`-XX:SurvivorRatio`调整这个比例。比如`-XX:SurvivorRatio=8`
+* **几乎**所有的Java对象都是在Eden区中被new出来的。
+* 绝大部分的Java对象的销毁都在新生代进行了。
+  * IBM公司的专门研究表明，新生代中80%的对象都是"朝生夕死"的。
+* 可以使用选项`-Xmn`设置新生代最大内存大小
+  * 这个参数一般使用默认值就可以了
+
+**下面这些参数开发中一般不会调:**
+1. 配置新生代与老年代在堆结构中的占比:
+   * 默认`-XX:NewRatio=2`，表示新生代占1，老年代占2，新生代占整个堆的1/3
+   * 可以修改`-XX:NewRatio=4`，表示新生代占1，老年代占4，新生代占整个堆的1/5
+   * <img src="JVM.Images.I/第08章_YoungOldRatio_1.png">
+2. 配置Eden空间和另外两个Survivor空间所占比例
+   * 默认是`-XX:SurvivorRatio=8`
+   * <img src="JVM.Images.I/第08章_SurvivorRatio_0.png">
+   * <img src="JVM.Images.I/第08章_SurvivorRatio_1.png">
+
+可以通过CLI查看`NewRatio`
+```shell
+➜  JVMTutorial git:(main) ✗ jps
+92657 Jps
+22930 Main
+1332 
+23481 
+92303 EdenSurvivorTest
+92302 Launcher
+➜  JVMTutorial git:(main) ✗ jinfo -flag NewRatio 92303
+-XX:NewRatio=2
+➜  JVMTutorial git:(main) ✗ jinfo -flag SurvivorRatio 92303 
+-XX:SurvivorRatio=8
+➜  JVMTutorial git:(main) ✗ jstat -gc 92303
+    S0C         S1C         S0U         S1U          EC           EU           OC           OU          MC         MU       CCSC      CCSU     YGC     YGCT     FGC    FGCT     CGC    CGCT       GCT   
+    25600.0     25600.0         0.0         0.0     153600.0     110603.7     409600.0          0.0     4480.0      779.6     384.0      76.0      0     0.000     0     0.000     -         -     0.000
+➜  JVMTutorial git:(main) ✗ 
+```
 
 ## 8.4 图解对象分配过程
 
@@ -65,6 +121,9 @@ Example: `com.atguigu.java.HeapDemo`
 
 ## Reference
 * 宋红康
+* [Java HotSpot VM](https://www.oracle.com/java/technologies/javase/vmoptions-jsp.html)
+* [Java Platform, Standard Edition Tools Reference - index](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/index.html)
+* [Java Platform, Standard Edition Tools Reference - Java](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html) JVM参数
 * [第十二篇 JVM之运行时数据区<8>: Java堆](https://www.cnblogs.com/zhexuejun/p/15705428.html)
 * [What Is a TLAB or Thread-Local Allocation Buffer in Java?](https://www.baeldung.com/java-jvm-tlab)
 * [终于搞明白Java8内存结构](https://cloud.tencent.com/developer/article/1869201)
