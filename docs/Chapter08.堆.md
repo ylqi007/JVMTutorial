@@ -107,7 +107,43 @@ Example: `com.atguigu.java.HeapDemo`
 ➜  JVMTutorial git:(main) ✗ 
 ```
 
+
 ## 8.4 图解对象分配过程
+### 8.4.1 对象分配过程: 概述
+为新对象分配内存是一件非常严谨和复杂的任务，JVM的设计者们不仅仅需要考虑内存如何分配、在哪里分配等问题，并且由于内存分配算法与内存回收算法密切相关，所以还需要考虑GC执行完后回收是否在内存空间中产生内存碎片。
+
+1. new的对象先放在伊甸园区。此区有大小限制。
+2. 当伊甸园区空间填满时，程序有需要创建对象，JVM的垃圾回收器将对伊甸园区进行垃圾回收(Minor GC)，将Eden区中不在被其他对象所引用的对象进行销毁。再加载新的对象放到Eden区。
+   * <img src="JVM.Images.I/第08章_新生代对象分配与回收过程.jpg">
+3. 然后将Eden区中的剩余对象移动到Survivor0区。
+4. 如果再次触发垃圾回收，此时上次幸存下来的放到Survivor0区的，如果没有被回收，就会放到Survivor1区。
+5. 如果再次经历垃圾回收，此时会重新放回Survivor0区，接着再去Survivor1区。
+6. 什么时候去老年区呢？可以设置次数，默认是15次。
+   * 可以设置参数: `-XX:MaxTenuringThreshold=N`进行设置
+7. 在老年去，相对悠闲。当老年区内存不足时，再次触发GC: Major GC，进行养老区的内存清理。
+8. 若养老区执行了Major GC之后发现，依然无法进行对象的保存，就会产生OOM异常。
+   * `java.lang.OutOfMemoryError: Java heap space`
+
+**总结:**
+* 针对幸存者区s0, s1区的总结: 复制之后有交换，谁空谁时to。
+* 关于垃圾回收: 频繁在新生区收集，很少在养老区收集，几乎不在永久区/元空间收集。
+
+### 8.4.2 对象分配的特殊情况
+<img src="JVM.Images.I/第08章_Java对象内存分配.png">
+
+<img src="JVM.Images.I/第08章_对象分配过程_JVisualVM.png">
+
+### 8.4.3 常用的调优工具
+* JDK命令行
+* Eclipse: Memory Analyzer Tool
+* Jconsole
+* VisualVM
+* Jprofiler
+* Java Flight Recorder
+* GCViewer
+* GC Easy
+
+<img src="JVM.Images.I/第08章_常用调优工具_Jprofiler.png">
 
 ## 8.5 Minor GC, Major GC, Full GC
 
