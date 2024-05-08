@@ -146,11 +146,106 @@ Example: `com.atguigu.java.HeapDemo`
 <img src="JVM.Images.I/第08章_常用调优工具_Jprofiler.png">
 
 ## 8.5 Minor GC, Major GC, Full GC
+JVM在进行GC时，并非每次都在对三个内存(新生代、老年代; 方法区)区域一起回收的，大部分时间回收的都是新生代。
+
+针对HotSpot VM的实现，它里面的GC按照回收区域又分为:
+* 部分收集: 不是完整收集整个Java堆的垃圾收集。其中又分为
+  * 新生代收集(Minor GC/Young GC): 只是新生代(Eden, S0, S1)的垃圾回收
+  * 老年代收集(Major GC/Old GC): 只是老年代的垃圾回收
+    * 目前，只有CMS GC会有单独收集老年代的行为
+    * 注意: 很多时候Major GC会和Full GC混淆使用，需要具体分辨是老年代回收还是整堆回收。
+  * 混合收集(Mixed GC): 收集整个新生代以及部分老年代的垃圾收集。
+    * 目前，只有G1 GC会有这种行为。
+* 整堆收集(Full GC): 收集整个Java堆(新生代+老年代)和方法区的垃圾收集。
+
+### 8.5.1 Minor GC
+年轻代GC(Minor GC)触发机制:
+* 当年轻代空间不足时，就会触发Minor GC，这里的年轻代满指的是Eden代满，Survivor满并不会触发GC。(每次Minor GC会清理年轻代的内存。) 
+* 因为Java对象大多都具备朝生夕死的特性，所以Minor GC非常频繁，一般回收速度也会比较快。这一定义既清晰又易于理解。
+* Minor GC会引发STW，暂停其他用户的线程，等垃圾回收结束，用户线程才会恢复运行。
+
+### 8.5.2 Major GC
+老年代GC(Major GC/Full GC)触发机制:
+* 指发生在老年代的GC，对象从老年代消失时，我们说"Major GC"或"Full GC"发生了。
+* 出现Major GC，经常会伴随至少依次的Minor GC(但非绝对的，在Parallel Scavenge收集器的收集策略里就有直接进行Major GC的策略选择过程)
+  * 也就是在老年代空间不足时，会先尝试触发Minor GC。如果之后空间还不足，则触发Major GC
+* Major GC的速度一般比Minor GC慢10倍以上，STW的时间更长。
+* 如果Major GC后，内存还不足，就报OOM了。
+
+### 8.5.3 Full GC
+Full GC触发机制: 触发Full GC执行的情况有如下五种:
+1. 调用`System.gc()`时，系统建议执行Full GC，但是不必然执行。
+2. 老年代空间不足
+3. 方法区空间不足
+4. 通过Minor GC后进入老年代的平均大小大于老年代的可用内存
+5. 由Eden区, survivor space0 (from space)区向survivor space1 (to space)区复制时，对象大小大于 to space可用的内存，则把对象转存到老年代，且老年代的可用内存大小小于该对象。
+
+说明: full gc是开发或调优中尽量要避免的。这样暂停时间会短一些。
+
+### 8.5.4 GC举例与日志分析
+OOM通常都伴随着Full GC
+<img src="JVM.Images.I/第08章_GCTest.png">
+
+Minor GC example: `[GC (Allocation Failure) [PSYoungGen: 2048K->512K(2560K)] 2048K->772K(9728K), 0.0007769 secs] [Times: user=0.00 sys=0.01, real=0.01 secs]`
+* 2048K: 指的是Minor GC之前，新生代占用情况
+* 512K: 指的是Minor GC之后，新生代的情况。由于包含了survivor区，所以并不为0
+* 2560K: 新生代总空间大小。
 
 ## 8.6 堆空间分代思想
+为什么需要把Java堆分代？不分代就不能正常工作吗？
+* 经研究，不同对象的生命周期不同。70%-90%的对象是临时对象。
+  * 新生代: 有Eden，两块大小相同的Survivor(又被称为from/to, s0/s1)构成，to总为空。
+  * 老年代: 存放新生代中经历多次GC仍然存活的对象。
+* 其实不分代完全可以，分代的唯一理由就是优化GC性能。如果没有分代，那所有的对象都在一起，就如同把一个学校的人都关在一个教室。GC的时候要找到哪些对象没用，这样就会对所有区域进行扫描。而很多时候对象都是朝生夕死的，如果分代的话，把新创建的对象放到某一地方，当GC的时候先把这块存储"朝生夕死"的对象进行回收，这样就会腾出很大的空间。
 
-## 8.7 内存分配策略
+
+## 8.7 内存分配策略(或对象提升(Promotion)规则)
+如果对象在Eden出生并经过第一次Minor GC后仍然存活，并且能被Survivor容纳的话，将会被移动到Survivor空间中，并将对象年龄设置为1。对象在Survivor区中每熬过一次Minor GC，年龄就增加1岁，当它的年龄增加到了一定程度(默认为15岁，其实每个JVM、每个GC都有不同)时，就会被晋升到老年代中。
+
+对象晋升老年代的年龄阈值，可以通过选项`-XX:MaxTenuringThreshold`来设置。
+
+**针对不同年龄段的对象分配原则如下所示:**
+* 优先分配到Eden
+* 大对象直接分配到老年代
+  * 尽量避免程序中出现过多的大对象
+* 长期存活的对象分配到老年代
+* 动态对象年龄判断
+  * 如果Survivor区中相同年龄的所有对象大小总和大于Survivor空间的一半，年龄大于或等于该年龄的对象可以直接进入老年代，无需等到MaxTenuringThreshold中要求的年龄。
+* 空间分配担保
+  * `-XX:HandlePromotionFailure`
+
+
 ## 8.8 为对象分配内存: TLAB
+**为什么有TLAB(Thread Local Allocation Buffer):**
+* 堆区是线程共享区域，任何线程都可以访问到堆区中的共享数据。
+* 由于对象实例的创建在JVM中非常频繁，因此在并发环境下从堆区中划分内存空间是线程不安全的。
+* 为了避免多个线程操作同一地址，需要使用加锁等机制，进而影响分配速度。
+
+**什么是TLAB?:**
+* 从内存模型而不是垃圾回收的角度，对Eden区域继续进行划分，JVM为每个线程分配了一个私有的缓存区域，它包含在Eden空间中。
+* 多线程同时分配内存时，使用TLAB可以避免一系列的非线程安全问题。同时还能够提升内存分配的吞吐量，因此我们可以将这种内存分配方式称为**快速分配策略**。
+* 所有OpenJDK衍生出来的JVM都提供了TLAB的设计。
+
+**TLAB的再说明:**
+* 尽管不是所有的对象实例都能够在TLAB中成功分配内存，但JVM确实是将TLAB作为内存分配的首选。
+* 在程序中，开发人员可以通过选项`-XX:UseTLAB`设置是否开启TLAB空间。
+* 默认情况下，TLAB空间的内存非常小，仅占整个Eden空间的1%，当然我们可以通过选项`-XX:TLABWasteTargetPercent`设置TLAB空间所占用Eden空间的百分比大小。
+* 一旦对象在TLAB空间分配内存失败时，JVM就会尝试着通过使用加锁机制确保数据操作的原子性，从而直接在Eden空间中分配内存。
+
+```shell
+➜  JVMTutorial git:(main) ✗ jps
+37136 Launcher
+37137 TLABArgsTest
+37219 Jps
+1332 
+27544 Main
+23481 
+➜  JVMTutorial git:(main) ✗ jinfo -flag UseTLAB 37137
+-XX:+UseTLAB
+```
+
+<img src="JVM.Images.I/第08章_对象分配过程.jpg">
+
 ## 8.9 小结堆空间的参数设置
 ## 8.10 堆是分配对象的唯一选择吗？
 
