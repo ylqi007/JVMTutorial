@@ -396,7 +396,6 @@ Java语言中方法重写(`@Override`)的本质:
 * Example: `com.atguigu.java3.StringBuilderTest`
 
 
-
 ## Reference
 * 宋红康
 * [JDK 11 Documentation](https://docs.oracle.com/en/java/javase/11/)
@@ -415,3 +414,4 @@ Java语言中方法重写(`@Override`)的本质:
 * [沉默王二: 深入理解 JVM 的栈帧结构](https://javabetter.cn/jvm/stack-frame.html)
 * :white_check_mark: [Java虚拟机—栈帧、操作数栈和局部变量表](https://zhuanlan.zhihu.com/p/45354152)
 * [JVM-栈帧之局部变量表](https://www.cnblogs.com/niulongwei/p/14864516.html)
+* [JVM（三）虚拟机栈 多合一总述](https://www.cnblogs.com/Timeouting-Study/p/12493906.html)

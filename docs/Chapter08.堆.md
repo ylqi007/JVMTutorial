@@ -3,7 +3,8 @@
 ## 8.1 堆的核心概述
 <img src="JVM.Images.I/第02章_JVM架构-简图.jpg">
 
-* 红色的方法区和堆对于一个进程而言，都是唯一的。
+* 红色的**方法区**(Method Area)和**堆**(Heap)对于一个进程而言，都是唯一的，也就是线程共享。
+* 灰色的**程序计数器**，**本地方法栈**和**Java虚拟机栈**是每个线程各有一份。
 
 堆(Heap)是JVM运行时数据区(Runtime Data Area)占用内存最大的一块区域。每一个运行的Java程序对应一个JVM进程，每一个JVM进程只存在一个堆区，它在JVM启动时被创建。JVM规范中规定堆区可以是物理上不连续的内存，但必须是逻辑上连续的内存。
 * 一个JVM实例只存在一个堆内存，堆也是Java内存管理的核心区域。
@@ -19,8 +20,8 @@
 
 <img src="JVM.Images.I/第08章_Runtime.Data.Area_堆_栈_方法区.png">
 
-* 栈负责运行
-* 堆负责存储
+* **栈**负责运行，解决程序的运行问题，即如何运行，或者说如何处理数据
+* **堆**负责存储，解决的是数据存储的问题，即数据怎么放，放哪里
 * 方法区
 
 ### 8.1.1 堆的核心概述: 内存细分
@@ -38,10 +39,8 @@
 * 约定: 新生去 <==> 新生代 <==> 年轻代； 养老区 <==> 老年区 <==> 老年代；永久区 <==> 永久代
 
 **堆内存细节，自JDK8开始有区别:**
-
 <img src="JVM.Images.I/第08章_堆空间-java7.jpg">
 <img src="JVM.Images.I/第08章_堆空间-java8.jpg">
-
 <img src="JVM.Images.I/第08章_堆和方法区图.jpg">
 
 Example: `com.atguigu.java.HeapDemo`
@@ -64,7 +63,7 @@ Example: `com.atguigu.java.HeapDemo`
 * 存储在JVM中的Java对象可以划分为两类：
   * 一类是生命周期比较短的瞬时对象，这类对象的创建和消亡都非常迅速。
   * 另一类对象的生命周期却非常长，在某些极端的情况下还能够与JVM的生命周期保持一致。
-* Java堆区进一步细分的话，可以划分为年轻代(YoungGen)和老年代(OldGen)。
+* **Java堆区**进一步细分的话，可以划分为**年轻代(YoungGen)**和**老年代(OldGen)**。
 * 其中年轻代又可以划分为Eden空间、Survivor0空间和Survivor1空间(有时也叫做from区和to区)
 * <img src="JVM.Images.I/第08章_堆空间细节.jpg">
 * 1. 伊甸区(Eden): 存放大部分新创建对象。
@@ -130,8 +129,9 @@ Example: `com.atguigu.java.HeapDemo`
 
 ### 8.4.2 对象分配的特殊情况
 <img src="JVM.Images.I/第08章_Java对象内存分配.png">
-
 <img src="JVM.Images.I/第08章_对象分配过程_JVisualVM.png">
+
+**内存溢出:** 当JVM无法申请到足够内存给堆空间或者没有足够的空间存储当前堆中的对象，就会出现`java.lang.OutOfMemoryError`。
 
 ### 8.4.3 常用的调优工具
 * JDK命令行
@@ -247,8 +247,125 @@ Minor GC example: `[GC (Allocation Failure) [PSYoungGen: 2048K->512K(2560K)] 204
 <img src="JVM.Images.I/第08章_对象分配过程.jpg">
 
 ## 8.9 小结堆空间的参数设置
-## 8.10 堆是分配对象的唯一选择吗？
 
+* Example: `com.atguigu.java1.HeapArgsTest`
+* 官网说明: [Java Platform, Standard Edition Tools Reference - Java](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html) JVM参数
+* `-XX:+PrintFlagsInitial`: 查看所有的参数的默认初始值 
+* `-XX:+PrintFlagsFinal`: 查看所有的参数的最终值(可能会存在修改，不再是初始值)
+* `-Xms`: 初始堆空间内存(默认为物理内存的1/64)
+* `-Xmx`: 最大堆空间内存(默认为物理内存的1/4)
+* `-Xmn`: 设置新生代的大小(初始值及最大值)
+* `-XX:NewRatio`: 配置新生代与老年代在堆结构的占比
+* `-XX:SurvivorRatio`: 设置新生代中Eden和S0/S1空间比例
+* `-XX:MaxTenuringThreshold`: 设置新生代垃圾的最大年龄
+* `-XX:+PrintGCDetails`: 输出纤细的GC处理日志
+  * 打印GC简要信息: `-XX:PrintGC` or `-verbose:gc`
+* `-XX:HandlePromotionFailure`: 是否分配空间分配担保
+
+在发生Minor GC之前，虚拟机会检查老年代最大的可用连续空间是否大于新生代所有对象的总空间。
+* 如果大于，则此次Minor GC是安全的
+* 如果小于，则虚拟机会查看`-XX:HandlePromotionFailure`设置值是否允许担保失败
+  * 如果`HandlePromotionFailure=true`，那么会继续检查老年代最大可用连续空间是否大于历次晋升失败到老年代的对象的平均大小。
+    * 如果大于，则尝试一次Minor GC，但这次Minor GC依然是有风险的。
+    * 如果小于，则改为进行一次Full GC。
+  * 如果`HandlePromotionFailure=false`，则改为进行一次Full GC。
+
+在JDK6 Update24 (i.e. JDK7)之后，`HandlePromotionFailure`参数不会再影响到虚拟机的空间分配担保策略，观察OpenJDK中的源码变化，虽然源码中还定义了`HandlePromotionFailure`参数，但是在代码中已经不会再使用它。JDK6 Update24之后的规则变为**只要老年代的连续空间大于新生代对象总大小**或者**历次晋升的平均大小就会进行Minor GC**，否则将进行Full GC。
+
+
+## 8.10 堆是分配对象的唯一选择吗？
+在《深入理解Java虚拟机》中关于Java堆内存有这样一段描述:
+> 随着JIT编译器的发展与逃逸分析技术逐渐成熟，**栈上分配、标量替换优化技术**将会导致一些微妙的变化，所有的对象都分配到堆上也渐渐变得不那么"绝对了"。
+> 
+> 在Java虚拟机中，对象是在Java堆中分配内存的，这是一个普遍的常识。但是，有一种特殊情况，那就是如果经过逃逸分析(Escape Analysis)后发现，一个对象没有逃逸出方法的话，那么就可能会被优化成栈上分配。这样就无需在堆上分配内存，也无须进行垃圾回收。这也是最常见的堆外存储技术。
+> 
+> 此外，前面提到的基于OpenJDK深度定制的TaoBaoVM，其中创新性的GCIH (GC Invisible Heap)技术实现off-heap，将生命周期较长的Java对象从heap中移至Heap外，并且GC不能管理GCIH内部的Java对象，以此达到降低GC的回收率和提升GC的回收效率的目的。
+
+### 8.10.1 逃逸分析概述
+* 如何将堆上的对象分配到栈，需要使用逃逸分析手段。
+* 这是一种可以有效减少Java程序中同步负载和内存堆分配压力的跨函数全局数据流分析算法。
+* 通过逃逸分析，Java HotSpot编译器能够分析出一个新的对象的引用使用范围从而决定是否要将这个对象分配到堆上。
+* 逃逸分析的基本行为就是分析对象动态作用域:
+  * 当一个对象在方法中被定义后，对象只在方法内部使用，则认为没有发生逃逸。没有发生逃逸的对象，则可以分配到栈上，随着方法执行的结束，栈空间就被移除了。
+  * 当一个对象在方法被定义后，它被外部方法所引用，则认为发生了逃逸。例如作为调用参数传递到其他地方。
+
+```java
+public static StringBuffer createStringBuffer(String s1, String s2) {
+    StringBuffer sb = new StringBuffer();
+    sb.append(s1);
+    sb.append(s2);
+    return sb;
+}
+```
+* 当上述方法在别处被调用时，`StringBuffer sb`就有可能在这个方法外部被调用，因此可能发生逃逸。
+
+改进
+```java
+public static String createStringBuffer(String s1, String s2) {
+    StringBuffer sb = new StringBuffer();
+    sb.append(s1);
+    sb.append(s2);
+    return sb.toString();
+}
+```
+* `StringBuffer sb`只在这个方法内部使用，而不会被外部方法用到。
+
+**参数设置:**
+* 在JDK6u24版本之后，HotSpot中默认已经开启逃逸分析。
+* 如果使用的是较早的版本，开发人员则可以通过
+  * 选项`-XX:+DoEscapeAnalysis`显式开启逃逸分析
+  * 通过选项`-XX:+PrintEscapeAnalysis`查看逃逸分析的筛选结果。
+
+**结论:** 开发中能使用局部变量的，就不要使用在方法外定义。
+
+#### 1. 逃逸分析: 代码优化
+使用逃逸分析，编译器可以对代码做如下优化:
+1. 栈上分配。将堆分配转化为栈分配。如果一个对象在子程序中被分配，要使指向该对象的指针永远不会逃逸，对象可能是栈分配的候选，而不是堆分配。
+2. 同步省略。如果一个对象被发现只能从一个线程被访问，那么对这个对象的操作可以不考虑同步。
+3. 分离对象或标量替换。有的对象可能不需要作为一个连续的内存结构存在也可以被访问到，那么对象的部分(或全部)可以不存储在内存，而是存储在CPU寄存器中。
+
+
+#### 2. 代码优化之栈上分配
+* JIT编译器在编译期间根据逃逸分析的结果，发现如果对象并没有逃逸出方法的话，就可能被优化成栈上分配。分配完成后，继续在调用栈内执行，最后线程结束，栈空间被回收，局部变量对象也被回收。这样就无须进行垃圾回收了。
+* 常见的栈上分配场景:
+  * 在逃逸分析中，已经说明了。分别是给成员变量赋值、方法返回值、实例引用传递。
+* Example: `com.atguigu.java2.StackAllocation`
+
+#### 3. 代码优化之同步省略
+* 线程同步的代价是相当高的，同步的后果是降低并发行和性能。
+* 在动态编译同步代码块的时候，JIT编译器可以借助逃逸分析来**判断同步代码块所使用的对象是否只能够被一个线程访问而没有被发布到其他线程**。如果没有，那么JIT编译器在编译这个同步代码块的时候就会取消对这部分代码的同步。这样就能大大提供并发行和性能。这个取消同步的过程就叫做同步省略，也叫做**锁消除**。
+* Example: `com.atguigu.java2.SynchronizedTest.f`
+  * 通过jclasslib查看class文件时，还是可以看到锁的，`monitorenter, monitorexit`，只是加载到内存时运行时，才会考虑优化掉。
+
+#### 4. 代码优化之标量替换
+* 标量(Scalar)是指一个无法再分解成更小的数据的数据。Java中的原始数据类型就是标量。
+* 相对的，那些还可以被分解的数据叫做聚合量(Aggregate)，Java中对象就是聚合量，因为它可以分解成其他聚合量和标量。
+* 在JIT阶段，如果讲过逃逸分析，发现其中一个对象不会被外界访问的话，那么经过JIT优化，就会把这个对象拆解成若干个其中包含若干个成员变量来替代。这个过程就是**标量替换**。
+* 标量替换参数设置:
+  * 参数`-XX:+EliminateAllocations`: 开启了标量替换(默认打开)，允许将对象分散分配在栈上。
+* Example: `com.atguigu.java2.ScalarReplace.main`
+* 上例代码在`main()`函数中进行了1亿次alloc。调用进行对象创建，由于User对象实例需要占据约16字节的空间，因此累计分配空间达到近1.5GB。如果堆空间小于这个值，就必然发生GC。使用如下参数运行上述代码: `-server -Xmx100m -Xms100m -XX:+DoEscapeAnalysis -XX:+PrintGC -XX:-EliminateAllocations`
+  * `-server`: 启动Server模式，因为在Server模式下，才可以启用逃逸分析。
+  * `-XX:+DoEscapeAnalysis`: 启用逃逸分析
+  * `-Xmx10m`: 指定了堆空间最大为10MB
+  * `-XX:PrintGC`: 打印GC日志
+  * `-XX:+EliminateAllocations`: 开启了标量替换(默认打开)，允许将对象打散分配在栈上，比如对象拥有`id`和`name`两个字段，那么这两个字段将会被视为两个独立的局部变量进行分配。
+  * `java -version`: 默认在64bit电脑上启动就是Server模式
+
+
+#### 5. 逃逸分析小结: 逃逸分析并不成熟
+* 关于逃逸分析的论文在1999年就已经发表了，但知道JDK 1.6才有实现，而且这项技术到如今也并不是十分成熟。
+* 其根本原因就是无法保证逃逸分析的性能消耗一定高于其他的消耗。虽然经过逃逸分析可以做标量替换，栈上分配，和锁消除。但是逃逸分析自身也是需要进行一系列复杂的分析的，这其实也是一个相对耗时的过程。
+* 一个极端的例子，就是经过逃逸分析之后，发现并没有一个对象是不逃逸的。那这个逃逸分析的过程就是白白的资源消耗。
+* 虽然这项技术并不十分成熟，但是它也是即时编译器优化技术中一个十分重要的手段。
+* 注意到有一些观点，认为通过逃逸分析，JVM会在栈上分配那些不会逃逸的对象，这在理论上是可行的，但是取决于JVM设计者的选择。Oracle Hotspot JVM中就并未这么做，这一点在逃逸分析相关的文档中已经说明了，所以可以明确所有的对象实例都是创建在堆上的。
+* 目前很多书籍还是基于JDK 7以前的版本，JDK已经发生了很大变化，intern字符串的缓存和静态变量曾经都被分配在永久代上，而永久代已经被元数据区取代。但是intern字符串缓存和静态变量并不是被转移到元数据区，而是直接在堆上分配，所以这一点同样符合前面一点的结论: 对象实例都是分配在堆上。
+
+
+## 本章小结
+* 年轻代是对象诞生、成长、消亡的区域，一个对象在这里产生、应用，最后被垃圾回收器收集、结束生命。
+* 老年代放置长生命周期的对象，通常都是从Survivor区域筛选拷贝过来的Java对象。当然，也有特殊情况，我们知道普通的对象会被分配在TLAB上；如果对象较大，JVM会试图直接分配在Eden其他位置上；如果对象太大，完全无法在新生代找到足够长的连续空间，JVM就会直接分配到老年代。
+* 当GC只发生在年轻代中，回收年轻代的行为被称为Minor GC。当GC发生在老年代时则被称为Major GC或者Full GC，即很多老年代中垃圾回收发生的频率大大低于年轻代。
 
 ## Reference
 * 宋红康
