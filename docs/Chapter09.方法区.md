@@ -75,7 +75,7 @@
 ## 9.4 方法区的内部结构
 <img src="JVM.Images.I/第09章_方法区简图.png">
 
-**方法区(Method Area)存储了什么？**
+### 9.4.1 方法区(Method Area)存储了什么？
 * 《深入理解Java虚拟机》书中对方法区(Method Area)存储内容描述如下: 它用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等。
   * <img src="JVM.Images.I/第09章_方法区存储信息.jpg">
   
@@ -112,9 +112,79 @@
       ConstantValue: int 2
       ```
 
+### 9.4.2 运行时常量池 vs 常量池
+* 方法区，内部包含了**运行时常量池(Runtime Constant Pool)**。
+* 字节码文件，内部包含了**常量池(Constant Pool)**。
+* 要弄清楚方法区，需要理解清楚ClassFile，因为加载类的信息都在方法区。
+* 要弄清楚方法区的运行时常量池，需要理解清楚ClassFile中的常量池。
+  * https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html
+
+一个有效的字节码文件中除了包含了版本信息、字段、方法以及接口等描述信息外，还包含一项信息那就是常量池表(Constant Pool Table)，包括各种字面量和对类型、域和方法的符号引用。
+
+#### 为什么需要常量池？
+一个Java源文件中的类、接口，编译后产生一个字节码文件。而Java中的字节码需要数据支持，通常这种数据会很大以至于不能直接存到字节码里，换另一种方式，可以存到常量池，这个字节码包含了指向常量池的引用。在动态链接的时候会用到运行时常量池。
+* <img src="JVM.Images.I/第09章_常量池.png">
+
+#### 常量池小结
+常量池，可以看作是一张表，虚拟机指令根据这种常量表找到要执行的类名、方法名、参数类型、字面量等类型。
+
+#### 运行时常量池
+* 运行时常量池(Runtime Constant Pool)是方法区的一部分。
+* 常量池表(Constant Pool Table)是class文件的一部分，用于存放编译期生成的各种字面量与符号引用，这部分内容在类加载后存放在方法区的运行时常量池中。
+* 运行时常量池，在加载类和接口到虚拟机后，就会创建对应的运行时常量池。
+* JVM为每个已加载的类型(类or接口)都维护一个常量池。池中的数据项像数组项一样，是通过索引访问的。
+* 运行时常量池中包含多个不同的常量，包括编译期就已经明确的数值字面量，也包括到运行期解析后才能获得的方法或者字段引用。此时不再是常量池中的符号地址，这里替换为真实地址。
+  * 运行时常量池，相对于Class文件常量池的另一重要特征是: 具备动态性。
+    * `String.intern()`
+* 运行时常量池类似于传统编程语言中的符号表(symbol table)，但是它所包含的数据却比符号表更加丰富一些。
+* 当创建类或接口的运行时常量池时，如果构造运行时常量池所需的内存空间超过了方法区所能提供的最大值，则JVM会抛出`OutOfMemoryError`异常。
 
 ## 9.5 方法区使用举例
+* Example: `com.atguigu.java.MethodAreaDemo`
+* [Youtube: 96 图示举例方法区的使用](https://www.youtube.com/watch?v=qkUOVYDw-tY&list=PLmOn9nNkQxJHNSznBikUX5sMv_XwDUYz4&index=96)
+
+
 ## 9.6 方法区的演进细节
+1. 首先明确: 只有HotSpot虚拟机才有永久代。BEA JRockit、IBM J9等来说，是不存在永久代的概念的。原则上如何实现方法区属于虚拟机实现细节，不受《Java虚拟机规范》管束，并不要求统一。
+2. HotSpot中方法区的变化: 
+   1. jdk1.6及之前: 有永久代(permanent generation)，静态变量存放在永久代上。
+   2. jdk1.7: 有永久代，但已经逐步"去永久代"，字符串常量池、静态变量移除，保存在堆中。
+   3. jdk1.8及以后: 无永久代，类型信息、字段、方法、常量保存在本地内存的元空间，但字符串常量池、静态变量仍在堆。
+3. <img src="JVM.Images.I/第09章_方法区的演进细节-hotspot.jpg">
+   1 在JDK7的时候，把静态常量和StringTable放到的堆中。
+   2. 在JDK8的时候，放方法区移出虚拟机内存，直接使用本地内存，此时方法区就不受虚拟机内存的限制了。
+
+### 9.6.1 永久代为什么要被元空间替换？
+* https://openjdk.org/jeps/122 (Motivation) (可以学学写Tech Doc)
+* 随着Java8的到来，HotSpot VM中再也见不到永久代了。但是这并不意味这类的元数据信息也消失了。这些数据被移动到了一个与堆不相连的本地内存，这个区域叫做元空间(Metaspace)。
+* 由于类的元数据分配在本地内存中，元空间的最大可分配空间就是系统可用内存空间。
+* 这项改动是必要的，原因有:
+  1. 为永久代设置空间大小是很难确定的。在某些场景下，如果动态加载类过多，容易长生Perm区的OOM。比如某个实际Web工程中，因为功能点比较多，在运行过程中，要不断动态加载很多类，经常出现致命错误。而元空间和永久代之间最大的区别在于: 元空间并不在虚拟机中，而是使用本地内存。因此，默认情况下，元空间的大小仅受本地内存限制。
+  2. 对永久代进行调优是很困难的。
+
+### 9.6.2 StringTable为什么要调整位置?
+JDK7中将StringTable放到了堆空间中。因为永久代的回收效率很低，在Full GC的时候才会触发。而Full GC是老年代的空间不足、永久代不足时才会触发。这就导致StringTable回收效率不高。而开发中会有大量的字符串被创建，回收效率低，导致永久代内存不足。放到堆里，能即时回收。
+
+### 9.6.3 静态变量放在哪里？
+* 工具: `jhsdb`
+* ```shell
+  ➜  java1 git:(main) ✗ jhsdb
+  clhsdb              command line debugger
+  hsdb                ui debugger
+  debugd --help       to get more information
+  jstack --help       to get more information
+  jmap   --help       to get more information
+  jinfo  --help       to get more information
+  jsnap  --help       to get more information
+  ```
+* Example: `com.atguigu.java1.StaticObjTest`
+  * `staticObj`随着Test的类型信息放在方法区
+  * `instanceObj`随着Test的对象实例存放在Java堆中
+  * `localObject`则是存放在`foo()`方法栈帧的局部变量表中
+  * 测试发现: 三个对象的数据在内存中的地址落在Eden区范围内，所以结论: 只要是对象实例，必然会在Java堆中分配。
+  * JDK7及其以后版本的HotSpot虚拟机选择把静态变量与类型在Java语言一端的映射Class对象存放在一起，存储于Java堆之中。
+
+
 ## 9.7 方法区的垃圾回收
 ## 9.8 总结
 
@@ -122,3 +192,5 @@
 ## Reference
 * 官方文档: https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html#jvms-2.5.4
 * 官方文档: https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html (`-XX:PermSize=size, -XX:MetaspaceSize=size`)
+* 官方文档 The class File Format: https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html
+* https://openjdk.org/jeps/122
