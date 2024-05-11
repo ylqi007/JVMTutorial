@@ -71,7 +71,48 @@
 2. 如果是内存泄漏，可进一步通过工具查看泄漏对象到GC Roots的引用链。于是就能找到泄漏对象是通过怎样的路径与GC Roots相关联并导致垃圾回收器无法自动回收它们的。掌握了泄漏对象的类型信息，以及GC Roots引用链的信息，就可以比较准确地定位出泄漏代码的位置。
 3. 如果不存在内存泄漏，换句话说就是内存中的对象确实都还必须活着，那就应当查看虚拟机的堆参数(`-Xms, -Xmx`)，与机器物理内存对比看是否还可以调大，从代码上检查是否存在某些对象生命周期过长、持有状态时间过长的情况，尝试减少程序运行期的内存消耗。
 
+
 ## 9.4 方法区的内部结构
+<img src="JVM.Images.I/第09章_方法区简图.png">
+
+**方法区(Method Area)存储了什么？**
+* 《深入理解Java虚拟机》书中对方法区(Method Area)存储内容描述如下: 它用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等。
+  * <img src="JVM.Images.I/第09章_方法区存储信息.jpg">
+  
+1. **类型信息**: 对每个加载的类型(类class，接口interface，枚举enum，注解annotation)，JVM必须在方法区中存储以下类型信息:
+   1. 这个类型的完整有效名称(全名=包名.类名)
+   2. 这个类型直接父类的完整有效名(对于interface或是java.lang.Object，都没有父类)
+   3. 这个类型的修饰符(public, abstract, final的某个子集)
+   4. 这个类型直接接口的一个有序列表
+2. **域(Field)信息**:
+   1. JVM必须在方法区中保存类型的所有域的相关信息以及域的声明顺序
+   2. 域的相关信息包括: 域名称，域类型，域修饰符(public, private, protected, static, final, volatile, transient的某个子集)
+3. **方法(Method)信息**: JVM必须保存所有方法的以下信息，同域信息一样包括声明顺序:
+   1. 方法名称
+   2. 方法的返回类型(或 void)
+   3. 方法参数的数量和类型(按顺序)
+   4. 方法的修饰符(public, private, protected, static, final, synchronized, native, abstract的一个子集)
+   5. 方法的字节码(bytecodes)，操作数栈、局部变量表及大小(abstract和native方法除外)
+   6. 异常表(abstract和native方法除外)
+      * 每个异常的开始位置、结束位置、代码处理在程序计数器中的偏移地址、被捕获的异常类的常量池索引
+4. **non-final的类变量**:
+   1. 静态变量和类关联在一起，随着类的加载而加载，它们成为类数据在逻辑是那个的一部分。
+   2. 类变量被类的所有实例共享，即使没有类实例时你也可以访问它。
+   3. Example: `com.atguigu.java.MethodAreaTest`
+5. **补充说明**: 全局常量。
+   1. 被声明为final的类变量(`static final`)的处理方法则不同，每个全局常量在编译的时候就会被分配了。
+   2. ```shell
+      public static int count;  // static 变量 (non-final)
+      descriptor: I
+      flags: ACC_PUBLIC, ACC_STATIC
+        
+      public static final int number; // static final 变量
+      descriptor: I
+      flags: ACC_PUBLIC, ACC_STATIC, ACC_FINAL
+      ConstantValue: int 2
+      ```
+
+
 ## 9.5 方法区使用举例
 ## 9.6 方法区的演进细节
 ## 9.7 方法区的垃圾回收

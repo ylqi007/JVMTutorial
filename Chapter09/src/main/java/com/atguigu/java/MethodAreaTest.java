@@ -8,7 +8,7 @@ package com.atguigu.java;
 public class MethodAreaTest {
     public static void main(String[] args) {
         Order order = null;
-        order.hello();
+        order.hello();  // 即使order是null，但是hello()方法是static方法，依然可以访问
         System.out.println(order.count);
     }
 }
