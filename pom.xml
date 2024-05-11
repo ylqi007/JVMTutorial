@@ -15,13 +15,15 @@
     <name>JVMTutorial</name>
     <description>JVMTutorial</description>
     <modules>
+        <module>Chapter02</module>
         <module>Chapter04</module>
         <module>Chapter05</module>
         <module>Chapter06</module>
         <module>Chapter08</module>
+        <module>Chapter09</module>
     </modules>
     <properties>
-        <java.version>17</java.version>
+        <java.version>1.8</java.version>
     </properties>
     <dependencies>
         <dependency>
