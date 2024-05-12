@@ -59,6 +59,14 @@
    * You can initialize this repository with code from a Subversion, Mercurial, or TFS project.
 
 
+## 添加新Module之后
+如果因为JDK版本问题而编译失败，需要调整以下两个地方
+1. Settings -> Build, Execution, Deployment -> Compiler -> Java Compiler -> Target bytecode version
+   * 将Target bytecode version修改为指定的版本
+2. Project Structure -> Modules -> <Specific Module> -> Sources/Dependencies
+   * 将Sources/Depedencies选择为指定的版本
+
+
 ## Reference
 * https://github.com/vectorxxxx/NOTE_JVM
 
