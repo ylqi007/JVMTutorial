@@ -15,6 +15,7 @@
     <name>JVMTutorial</name>
     <description>JVMTutorial</description>
     <modules>
+        <module>Chapter01</module>
         <module>Chapter02</module>
         <module>Chapter04</module>
         <module>Chapter05</module>

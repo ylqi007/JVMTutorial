@@ -29,6 +29,7 @@ public class ClassLoaderTest1 {
 
         System.out.println("====== 扩展类加载器 =====");
         String extDirs = System.getProperty("java.ext.dirs");
+        System.out.println(extDirs);
         for(String dir: extDirs.split(":")) {
             System.out.println(dir);
         }
