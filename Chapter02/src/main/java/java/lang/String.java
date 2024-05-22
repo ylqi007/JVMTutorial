@@ -6,7 +6,7 @@ package java.lang;
  * @Author: ylqi007
  * @Create: 4/27/24 19:21
  */
-public class String {
+public class String1 {
 
     static {
         System.out.println("我是自定义的String类的stitic block");
