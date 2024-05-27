@@ -9,7 +9,6 @@ package com.atguigu.java;
 public class CanReliveObj {
     public static CanReliveObj obj;//类变量，属于 GC Root
 
-
     //此方法只能被调用一次
     @Override
     protected void finalize() throws Throwable {

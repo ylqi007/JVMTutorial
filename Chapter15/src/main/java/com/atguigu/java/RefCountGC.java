@@ -25,10 +25,10 @@ public class RefCountGC {
         //这里发生GC，obj1和obj2能否被回收？
         System.gc();
 
-//        try {
-//            Thread.sleep(1000000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            Thread.sleep(1000000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
