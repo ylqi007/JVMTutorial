@@ -28,6 +28,7 @@
         <module>Chapter13</module>
         <module>Chapter15</module>
         <module>Chapter16</module>
+        <module>Chapter17</module>
     </modules>
     <properties>
         <java.version>1.8</java.version>
