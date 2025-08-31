@@ -68,7 +68,30 @@
 
 
 ## Reference
-* https://github.com/vectorxxxx/NOTE_JVM
+* ✅ B站: [尚硅谷JVM全套教程，百万播放，全网巅峰（宋红康详解java虚拟机）](https://www.bilibili.com/video/BV1PJ411n7xZ)
+  * ✅ [JVM从入门到精通](https://www.yuque.com/u21195183/jvm)
+  * https://github.com/vectorxxxx/NOTE_JVM
+* https://github.com/youthlql/JavaYouth?tab=readme-ov-file
+* 
+* 参考书目
+  * JDK 官方：[Java Language and Virtual Machine Specifications](https://docs.oracle.com/javase/specs/index.html)
+  * [Java Platform, Standard Edition Documentation](https://docs.oracle.com/en/java/javase/index.html)
+    * [Java Platform, Standard Edition (Java SE) 8](https://docs.oracle.com/javase/8/index.html)
+    * [JDK 17 Documentation](https://docs.oracle.com/en/java/javase/17/)
+  * 《深入理解Java虚拟机》
 
 ## Q&A
 * [Error: Java: invalid target release: 11 - IntelliJ IDEA](https://stackoverflow.com/questions/54137286/error-java-invalid-target-release-11-intellij-idea)
+
+
+## Others
+* https://www.tiobe.com/tiobe-index/
+
+
+## 说明
+* 20250830，开始复习
+* Plugin: jclasslib
+
+
+## 关于 JDK8 和 JDK17 的选择
+[JDK8还是JDK17.md](JDK8%E8%BF%98%E6%98%AFJDK17.md)

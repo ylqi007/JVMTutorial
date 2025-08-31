@@ -1,15 +1,14 @@
 package java.lang;
 
 /**
- * Description:
- *
  * @Author: ylqi007
  * @Create: 4/27/24 19:21
+ * @Description: 错误示例，为了演示双亲委派机制的安全机制
  */
-public class String1 {
+public class String {
 
     static {
-        System.out.println("我是自定义的String类的stitic block");
+        System.out.println("我是自定义的String类的static block");
     }
 
     //Error: Main method not found in class java.lang.String, please define the main method as:
