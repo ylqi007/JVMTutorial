@@ -1,9 +1,9 @@
 # Chapter08 堆(Heap)
 
-## 8.1 堆的核心概述
+## 8.1 堆(heap)的核心概述
 <img src="JVM.Images.I/第02章_JVM架构-简图.jpg">
 
-* 红色的**方法区**(Method Area)和**堆**(Heap)对于一个进程而言，都是唯一的，也就是线程共享。
+* 红色的**方法区**(Method Area)和**堆**(Heap)对于一个**进程**而言，都是唯一的，也就是线程共享。一个进程对应一个 JVM 实例(`java.lang.Runtime`)。
 * 灰色的**程序计数器**，**本地方法栈**和**Java虚拟机栈**是每个线程各有一份。
 
 堆(Heap)是JVM运行时数据区(Runtime Data Area)占用内存最大的一块区域。每一个运行的Java程序对应一个JVM进程，每一个JVM进程只存在一个堆区，它在JVM启动时被创建。JVM规范中规定堆区可以是物理上不连续的内存，但必须是逻辑上连续的内存。
@@ -12,39 +12,45 @@
   * 堆内存的大小是可以调节的。
 * 《Java虚拟机规范》规定，堆可以处于物理上不连续的内存空间中，但在逻辑上，它应该被视为连续的。
 * 所有的线程共享Java堆，在这里还可以划分线程私有的缓冲区(Thread Local Allocation Buffer, TLAB)
-* 《Java虚拟机规范》中对Java堆的描述是: 所有的对象实例以及数组都应当在运行时分配堆上。(The heap is the runtime data area from which memory for all class instances and arrays is allocated)。
+* 《Java虚拟机规范》中对Java堆的描述是: 所有的对象实例以及数组都应当在运行时分配堆上。(`The heap is the runtime data area from which memory for all class instances and arrays is allocated`)。
   * 我(shk)要说的是:"几乎"所有的对象实例都在这里分配内存。--从实际使用角度看。
 * 数组和对象可能永远不会存储在栈上，因为栈帧中保存引用，这个引用指向对象或者数组在堆中的位置。
 * 在方法结束后，堆中的对象不会马上被移除，仅仅在垃圾收集的时候才会被移除。
-* 堆，是GC(Garbage Collection, 垃圾收集器)执行垃圾回收的重点区域。
+* ✅ **堆，是GC(Garbage Collection, 垃圾收集器)执行垃圾回收的重点区域**。
 
-<img src="JVM.Images.I/第08章_Runtime.Data.Area_堆_栈_方法区.png">
+<img src="JVM.Images.I/第02章_JVM架构-简图.jpg">
 
 * **栈**负责运行，解决程序的运行问题，即如何运行，或者说如何处理数据
 * **堆**负责存储，解决的是数据存储的问题，即数据怎么放，放哪里
 * 方法区
 
+<img src="JVM.Images.I/第08章_VMStack_Heap_MethodArea.png">
+
 ### 8.1.1 堆的核心概述: 内存细分
 现代垃圾回收器大部分都基于分代收集理论设计，堆空间细分为:
-* Java7及以前的堆内存逻辑上分为三部分: 新生区 + 养老区 + **永久区**
+* Java7及以前的堆内存逻辑上分为三部分: 新生区 + 养老区 + **永久区(Permanent Space)**
   * Young Generation Space
     * 又被划分为Eden区和Survivor区
   * Tenure Generation Space
   * **Permanent Space**
-* Java8及以后内存逻辑上分为三部分: 新生区 + 养老区 + **元空间**
+* Java8及以后内存逻辑上分为三部分: 新生区 + 养老区 + **元空间(Meta Space)**
   * Young Generation Space
     * 又被划分为Eden区和Survivor区
   * Tenure Generation Space
   * **Meta Space**
 * 约定: 新生去 <==> 新生代 <==> 年轻代； 养老区 <==> 老年区 <==> 老年代；永久区 <==> 永久代
 
+JDK7中的永久区(Permanent Space)和JDK8中的元空间(Meta Space)，都视为方法区的具体实现。
+
 **堆内存细节，自JDK8开始有区别:**
 <img src="JVM.Images.I/第08章_堆空间-java7.jpg">
 <img src="JVM.Images.I/第08章_堆空间-java8.jpg">
 <img src="JVM.Images.I/第08章_堆和方法区图.jpg">
+* Method Area 在 JDK7 和 JDK8 中的实现不同。在 JDK7 中叫 Permanent Generation(永久带)，在 JDK8 中的实现叫 Meta Space(元空间)。
 
 Example: `com.atguigu.java.HeapDemo`
 <img src="JVM.Images.I/第08章_VisualGC_新生代_老年代.png">
+
 
 ## 8.2 设置堆内存大小与OOM
 * Java堆区用于存储Java对象实例，那么堆的大小在JVM启动时就已经设定好了，大家可以通过选项`-Xmx`和`-Xms`来进行设置。
@@ -58,6 +64,7 @@ Example: `com.atguigu.java.HeapDemo`
   * 最大内存大小: 物理内存大小/4
 
 <img src="JVM.Images.I/第08章_OOMTest.png">
+
 
 ## 8.3 年轻代与老年代
 * 存储在JVM中的Java对象可以划分为两类：
@@ -105,13 +112,17 @@ Example: `com.atguigu.java.HeapDemo`
     25600.0     25600.0         0.0         0.0     153600.0     110603.7     409600.0          0.0     4480.0      779.6     384.0      76.0      0     0.000     0     0.000     -         -     0.000
 ➜  JVMTutorial git:(main) ✗ 
 ```
+* S0C + S1C + EC + OC = 600MB
+* S0 + EC + OC = 575MB (S0, S1 轮流使用)
+
+* [Demo01EdenSurvivorTest.java](../JVMPart1/src/main/java/com/ylqi007/chap08heap/demo2/Demo01EdenSurvivorTest.java)
 
 
 ## 8.4 图解对象分配过程
 ### 8.4.1 对象分配过程: 概述
 为新对象分配内存是一件非常严谨和复杂的任务，JVM的设计者们不仅仅需要考虑内存如何分配、在哪里分配等问题，并且由于内存分配算法与内存回收算法密切相关，所以还需要考虑GC执行完后回收是否在内存空间中产生内存碎片。
 
-1. new的对象先放在伊甸园区。此区有大小限制。
+1. new的对象先放在伊甸园区(Eden)。此区有大小限制。
 2. 当伊甸园区空间填满时，程序有需要创建对象，JVM的垃圾回收器将对伊甸园区进行垃圾回收(Minor GC)，将Eden区中不在被其他对象所引用的对象进行销毁。再加载新的对象放到Eden区。
    * <img src="JVM.Images.I/第08章_新生代对象分配与回收过程.jpg">
 3. 然后将Eden区中的剩余对象移动到Survivor0区。
@@ -127,6 +138,8 @@ Example: `com.atguigu.java.HeapDemo`
 * 针对幸存者区s0, s1区的总结: 复制之后有交换，谁空谁时to。
 * 关于垃圾回收: 频繁在新生区收集，很少在养老区收集，几乎不在永久区/元空间收集。
 
+* https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html (-XX:NewRatio=ratio)
+
 ### 8.4.2 对象分配的特殊情况
 <img src="JVM.Images.I/第08章_Java对象内存分配.png">
 <img src="JVM.Images.I/第08章_对象分配过程_JVisualVM.png">
@@ -134,16 +147,17 @@ Example: `com.atguigu.java.HeapDemo`
 **内存溢出:** 当JVM无法申请到足够内存给堆空间或者没有足够的空间存储当前堆中的对象，就会出现`java.lang.OutOfMemoryError`。
 
 ### 8.4.3 常用的调优工具
-* JDK命令行
+* JDK命令行: jps, jinfo, jmap, jstat, jstack
 * Eclipse: Memory Analyzer Tool
 * Jconsole
 * VisualVM
-* Jprofiler
+* Jprofiler: 收费
 * Java Flight Recorder
 * GCViewer
 * GC Easy
 
 <img src="JVM.Images.I/第08章_常用调优工具_Jprofiler.png">
+
 
 ## 8.5 Minor GC, Major GC, Full GC
 JVM在进行GC时，并非每次都在对三个内存(新生代、老年代; 方法区)区域一起回收的，大部分时间回收的都是新生代。
@@ -156,13 +170,15 @@ JVM在进行GC时，并非每次都在对三个内存(新生代、老年代; 方
     * 注意: 很多时候Major GC会和Full GC混淆使用，需要具体分辨是老年代回收还是整堆回收。
   * 混合收集(Mixed GC): 收集整个新生代以及部分老年代的垃圾收集。
     * 目前，只有G1 GC会有这种行为。
-* 整堆收集(Full GC): 收集整个Java堆(新生代+老年代)和方法区的垃圾收集。
+* 整堆收集(Full GC): 收集整个Java堆(新生代+老年代)和**方法区**的垃圾收集。
+
 
 ### 8.5.1 Minor GC
 年轻代GC(Minor GC)触发机制:
-* 当年轻代空间不足时，就会触发Minor GC，这里的年轻代满指的是Eden代满，Survivor满并不会触发GC。(每次Minor GC会清理年轻代的内存。) 
+* 当年轻代空间不足时，就会触发Minor GC，这里的年轻代满指的是**Eden**代满，Survivor满并不会触发GC。(每次Minor GC会清理年轻代的内存。) 
 * 因为Java对象大多都具备朝生夕死的特性，所以Minor GC非常频繁，一般回收速度也会比较快。这一定义既清晰又易于理解。
 * Minor GC会引发STW，暂停其他用户的线程，等垃圾回收结束，用户线程才会恢复运行。
+
 
 ### 8.5.2 Major GC
 老年代GC(Major GC/Full GC)触发机制:
@@ -171,6 +187,7 @@ JVM在进行GC时，并非每次都在对三个内存(新生代、老年代; 方
   * 也就是在老年代空间不足时，会先尝试触发Minor GC。如果之后空间还不足，则触发Major GC
 * Major GC的速度一般比Minor GC慢10倍以上，STW的时间更长。
 * 如果Major GC后，内存还不足，就报OOM了。
+
 
 ### 8.5.3 Full GC
 Full GC触发机制: 触发Full GC执行的情况有如下五种:
@@ -182,6 +199,7 @@ Full GC触发机制: 触发Full GC执行的情况有如下五种:
 
 说明: full gc是开发或调优中尽量要避免的。这样暂停时间会短一些。
 
+
 ### 8.5.4 GC举例与日志分析
 OOM通常都伴随着Full GC
 <img src="JVM.Images.I/第08章_GCTest.png">
@@ -190,6 +208,7 @@ Minor GC example: `[GC (Allocation Failure) [PSYoungGen: 2048K->512K(2560K)] 204
 * 2048K: 指的是Minor GC之前，新生代占用情况
 * 512K: 指的是Minor GC之后，新生代的情况。由于包含了survivor区，所以并不为0
 * 2560K: 新生代总空间大小。
+
 
 ## 8.6 堆空间分代思想
 为什么需要把Java堆分代？不分代就不能正常工作吗？
@@ -229,7 +248,7 @@ Minor GC example: `[GC (Allocation Failure) [PSYoungGen: 2048K->512K(2560K)] 204
 **TLAB的再说明:**
 * 尽管不是所有的对象实例都能够在TLAB中成功分配内存，但JVM确实是将TLAB作为内存分配的首选。
 * 在程序中，开发人员可以通过选项`-XX:UseTLAB`设置是否开启TLAB空间。
-* 默认情况下，TLAB空间的内存非常小，仅占整个Eden空间的1%，当然我们可以通过选项`-XX:TLABWasteTargetPercent`设置TLAB空间所占用Eden空间的百分比大小。
+* 默认情况下，TLAB空间的内存非常小，仅占整个Eden空间的`1%`，当然我们可以通过选项`-XX:TLABWasteTargetPercent`设置TLAB空间所占用Eden空间的百分比大小。
 * 一旦对象在TLAB空间分配内存失败时，JVM就会尝试着通过使用加锁机制确保数据操作的原子性，从而直接在Eden空间中分配内存。
 
 ```shell
@@ -245,6 +264,7 @@ Minor GC example: `[GC (Allocation Failure) [PSYoungGen: 2048K->512K(2560K)] 204
 ```
 
 <img src="JVM.Images.I/第08章_对象分配过程.jpg">
+
 
 ## 8.9 小结堆空间的参数设置
 
@@ -281,13 +301,25 @@ Minor GC example: `[GC (Allocation Failure) [PSYoungGen: 2048K->512K(2560K)] 204
 > 
 > 此外，前面提到的基于OpenJDK深度定制的TaoBaoVM，其中创新性的GCIH (GC Invisible Heap)技术实现off-heap，将生命周期较长的Java对象从heap中移至Heap外，并且GC不能管理GCIH内部的Java对象，以此达到降低GC的回收率和提升GC的回收效率的目的。
 
+
 ### 8.10.1 逃逸分析概述
 * 如何将堆上的对象分配到栈，需要使用逃逸分析手段。
 * 这是一种可以有效减少Java程序中同步负载和内存堆分配压力的跨函数全局数据流分析算法。
-* 通过逃逸分析，Java HotSpot编译器能够分析出一个新的对象的引用使用范围从而决定是否要将这个对象分配到堆上。
+* **通过逃逸分析，Java HotSpot编译器能够分析出一个新的对象的引用使用范围从而决定是否要将这个对象分配到堆上**。
 * 逃逸分析的基本行为就是分析对象动态作用域:
   * 当一个对象在方法中被定义后，对象只在方法内部使用，则认为没有发生逃逸。没有发生逃逸的对象，则可以分配到栈上，随着方法执行的结束，栈空间就被移除了。
   * 当一个对象在方法被定义后，它被外部方法所引用，则认为发生了逃逸。例如作为调用参数传递到其他地方。
+
+```java
+public void my_method() {
+    V v = new V();
+    // use v
+    // ....
+    v = null;
+}
+```
+没有发生逃逸的对象，则可以分配到栈上，随着方法执行的结束，栈空间就被移除，每个栈里面包含了很多栈帧
+
 
 ```java
 public static StringBuffer createStringBuffer(String s1, String s2) {
@@ -316,28 +348,31 @@ public static String createStringBuffer(String s1, String s2) {
   * 选项`-XX:+DoEscapeAnalysis`显式开启逃逸分析
   * 通过选项`-XX:+PrintEscapeAnalysis`查看逃逸分析的筛选结果。
 
-**结论:** 开发中能使用局部变量的，就不要使用在方法外定义。
+✅ **结论:** 开发中能使用局部变量的，就不要使用在方法外定义。
 
-#### 1. 逃逸分析: 代码优化
+
+### 8.10.2 逃逸分析: 代码优化
 使用逃逸分析，编译器可以对代码做如下优化:
 1. 栈上分配。将堆分配转化为栈分配。如果一个对象在子程序中被分配，要使指向该对象的指针永远不会逃逸，对象可能是栈分配的候选，而不是堆分配。
 2. 同步省略。如果一个对象被发现只能从一个线程被访问，那么对这个对象的操作可以不考虑同步。
 3. 分离对象或标量替换。有的对象可能不需要作为一个连续的内存结构存在也可以被访问到，那么对象的部分(或全部)可以不存储在内存，而是存储在CPU寄存器中。
 
 
-#### 2. 代码优化之栈上分配
+#### 1. 代码优化之栈上分配
 * JIT编译器在编译期间根据逃逸分析的结果，发现如果对象并没有逃逸出方法的话，就可能被优化成栈上分配。分配完成后，继续在调用栈内执行，最后线程结束，栈空间被回收，局部变量对象也被回收。这样就无须进行垃圾回收了。
 * 常见的栈上分配场景:
-  * 在逃逸分析中，已经说明了。分别是给成员变量赋值、方法返回值、实例引用传递。
+  * 在逃逸分析中，已经说明了。分别是**给成员变量赋值**、**方法返回值**、**实例引用传递**。
 * Example: `com.atguigu.java2.StackAllocation`
 
-#### 3. 代码优化之同步省略
+
+#### 2. 代码优化之同步省略
 * 线程同步的代价是相当高的，同步的后果是降低并发行和性能。
 * 在动态编译同步代码块的时候，JIT编译器可以借助逃逸分析来**判断同步代码块所使用的对象是否只能够被一个线程访问而没有被发布到其他线程**。如果没有，那么JIT编译器在编译这个同步代码块的时候就会取消对这部分代码的同步。这样就能大大提供并发行和性能。这个取消同步的过程就叫做同步省略，也叫做**锁消除**。
 * Example: `com.atguigu.java2.SynchronizedTest.f`
   * 通过jclasslib查看class文件时，还是可以看到锁的，`monitorenter, monitorexit`，只是加载到内存时运行时，才会考虑优化掉。
 
-#### 4. 代码优化之标量替换
+
+#### 3. 代码优化之标量替换
 * 标量(Scalar)是指一个无法再分解成更小的数据的数据。Java中的原始数据类型就是标量。
 * 相对的，那些还可以被分解的数据叫做聚合量(Aggregate)，Java中对象就是聚合量，因为它可以分解成其他聚合量和标量。
 * 在JIT阶段，如果讲过逃逸分析，发现其中一个对象不会被外界访问的话，那么经过JIT优化，就会把这个对象拆解成若干个其中包含若干个成员变量来替代。这个过程就是**标量替换**。
@@ -369,6 +404,7 @@ public static String createStringBuffer(String s1, String s2) {
 
 ## Reference
 * 宋红康
+* [6. 堆](https://www.yuque.com/u21195183/jvm/lep6m9)
 * [Java HotSpot VM](https://www.oracle.com/java/technologies/javase/vmoptions-jsp.html)
 * [Java Platform, Standard Edition Tools Reference - index](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/index.html)
 * [Java Platform, Standard Edition Tools Reference - Java](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html) JVM参数

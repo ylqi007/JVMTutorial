@@ -2,7 +2,7 @@
 
 ## 1. 本地方法？
 ### 1.1 什么是本地方法？
-简单讲，一个Native Method就是一个Java调用非Java代码的接口。
+简单讲，一个`Native Method`就是一个Java调用非Java代码的接口。
 一个Native Method是这样一个Java方法: 该方法的实现是由非Java语言实现，比如C。
 这个特种并非Java所特有，很多其他的编程语言都由这一机制，比如在C++中，你可以用`extend "C"`告知C++编译器去调用一个C的函数。
 
@@ -10,15 +10,16 @@
 
 在定义一个Native Method时，并不提供实现体(有些像定义一个Java interface)，因为其实现体是由非Java语言在外面实现的。
 
-本地接口的作用是融合不同编程语言为Java所用，它的初衷是融合C/C++程序。
+**本地接口**的作用是融合不同编程语言为Java所用，它的初衷是融合C/C++程序。
 
+<img src="JVM.Images.I/第06章_本地方法_Native_Method.png">
 
 * `java.lang.Object.getClass`: `public final native Class<?> getClass();`
   * 看似没有方法体，实际上是有的，不过方法体的具体实现是C/C++
 * `java.lang.Thread.start0`: `private native void start0();`
 * `java.lang.Thread.setPriority0`: `private native void setPriority0(int newPriority);`
 
-* 标识符`native`可以与所有其他的java标识符连用，但是abstract除外。
+* 标识符`native`可以与所有其他的java标识符连用，但是`abstract`除外。
 
 
 ### 1.2 为什么要使用Native Method？
@@ -33,8 +34,8 @@ Java使用起来非常方便，然而有些层次的任务用Java实现起来并
 
 
 ## 2. 本地方法栈
-* Java虚拟机用于管理Java方法的调用，而本地方法栈用于管理本地方法的调用。
-* 本地方法栈也是线程私有的。
+* **Java虚拟机用于管理Java方法的调用，而本地方法栈用于管理本地方法的调用**。
+* **本地方法栈也是线程私有的**。
 * 允许被实现成固定或者可动态扩展的内存大小。(在内存溢出方法是相同的)
   * 如果线程请求分配的栈容量超过本地方法栈允许的最大容量，Java虚拟机将会抛出一个`StackOverflowError`异常。
   * 如果本地方法栈可以动态扩展，并且在尝试扩展的时候无法申请到足够的内存，或者在创建新的线程时没有足够的内存去创建对象的本地方法栈，那么Java虚拟机将会抛出一个`OutOfMemoryError`异常。
@@ -48,5 +49,9 @@ Java使用起来非常方便，然而有些层次的任务用Java实现起来并
 * 在HotSpot JVM中，直接将本地方法栈和虚拟机栈合二为一。
 
 
+<img src="JVM.Images.I/第06章_本地方法栈_NativeMethodStack.png">
+
+
 ## Reference
 * [4. 虚拟机栈](https://www.yuque.com/u21195183/jvm/ar6bqp)
+* [5. 本地方法接口和本地方法栈](https://www.yuque.com/u21195183/jvm/rwvh9m)
