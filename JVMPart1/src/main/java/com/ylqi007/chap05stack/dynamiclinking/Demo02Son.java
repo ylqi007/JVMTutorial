@@ -1,4 +1,4 @@
-package com.atguigu.java2;
+package com.ylqi007.chap05stack.dynamiclinking;
 
 /**
  * 解析调用中非虚方法、虚方法的测试
@@ -25,15 +25,16 @@ class Father {
     }
 }
 
-public class Son extends Father {
-    public Son() {
+public class Demo02Son extends Father {
+    public Demo02Son() {
         //invokespecial
         super();
     }
-    public Son(int age) {
+    public Demo02Son(int age) {
         //invokespecial
         this();
     }
+
     //不是重写的父类的静态方法，因为静态方法不能被重写！
     public static void showStatic(String str) {
         System.out.println("son " + str);
@@ -53,7 +54,7 @@ public class Son extends Father {
         super.showCommon();
 
         //invokevirtual
-        //showFinal();//因为此方法声明有final，不能被子类重写，所以也认为此方法是非虚方法。
+        showFinal();//因为此方法声明有final，不能被子类重写，所以也认为此方法是非虚方法。
         super.showFinal();  // invokespecial,因为显式加了super
 
         //虚方法如下：
@@ -75,7 +76,7 @@ public class Son extends Father {
     }
 
     public static void main(String[] args) {
-        Son so = new Son();
+        Demo02Son so = new Demo02Son();
         so.show();
     }
 

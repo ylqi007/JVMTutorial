@@ -1,4 +1,8 @@
 # Chapter04 程序计数器(PC寄存器)
+From [JDK8 The Java® Virtual Machine Specification ](https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html#jvms-2.5.1)
+> 2.5.1. The pc Register
+> The Java Virtual Machine can support many threads of execution at once (JLS §17). Each Java Virtual Machine thread has its own pc (program counter) register. At any point, each Java Virtual Machine thread is executing the code of a single method, namely the current method (§2.6) for that thread. If that method is not native, the pc register contains the address of the Java Virtual Machine instruction currently being executed. If the method currently being executed by the thread is native, the value of the Java Virtual Machine's pc register is undefined. The Java Virtual Machine's pc register is wide enough to hold a returnAddress or a native pointer on the specific platform.
+
 
 ## 1. PC Register介绍
 <img src="JVM.Images.I/第04章_PC寄存器.jpeg">
@@ -18,11 +22,12 @@ JVM中的程序计数寄存器(Program Counter Register)中，Register的命名�
 **PC Register介绍:**
 * 它是一块很小的内存空间，几乎可以忽略不计。也是运行速度最快的存储区域。
 * 在JVM规范中，每个线程都由它自己的程序计数器，也是线程私有的，声明周期与线程的声明周期保持一致。
-* 任何时间一个线程都只有一个方法在执行，也就是所谓的**当前方法**。程序计数器会存储当前线程正在执行的Java方法的JVM指令地址；或者，如果是在执行native方法，则是为指定值(undefined)。
-  * native方法，即C语言写的方法。。。
+* 任何时间一个线程都只有一个方法在执行，也就是所谓的**当前方法**。程序计数器会存储当前线程正在执行的Java方法的JVM指令地址；或者，如果是在执行`native`方法，则是为指定值(`undefined`)。
+  * native方法，即C语言写的方法。。。比如 JUC 中的 Unsafe 类
 * 它是程序控制流的指示器，分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖这个计数器来完成。
 * 字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令。
-* 它是唯一一个在Java虚拟机规范中没有规定任何OutOfMemoryError的区域。
+* 它是唯一一个在Java虚拟机规范中没有规定任何`OutOfMemoryError`的区域。
+* PC Register 既没有GC，也没有OOM
 
 
 ## 2. 举例说明
@@ -111,6 +116,8 @@ Constant pool:
 SourceFile: "PCRegisterTest.java"
 ➜  atguigu git:(main)
 ```
+* `Code` 部份的第一列就是指令地址(偏移地址)，就存放于 PC register中
+* `Code` 部份的第二列就是操作指令(比如`bipush`, `istore_1`, etc)
 
 <img src="JVM.Images.I/第04章_PC寄存器_举例.png">
 
@@ -122,9 +129,10 @@ SourceFile: "PCRegisterTest.java"
 
 ## 3. 两个常见问题
 ### 3.1 使用PC寄存器存储字节码指令地址有什么用？or 为什么使用PC寄存器记录当前线程的执行地址？
-
 因为CPU需要不停地切换各个线程，切换回来以后，就需要知道接着从哪开始继续执行。
 JVM的字节码解释器就需要通过改变PC寄存器的值来明确下一条应该执行什么样的字节码指令。
+
+==> 保存现场
 
 ### 3.2 PC寄存器为什么会被设定为线程私有？
 由于JVM的多线程是通过线程轮流切换并分配处理器执行时间的方式来实现的，在任何一个确定的时刻，一个处理器都只会执行一条线程中的指令。因此为了能够准确的记录各个线程正在执行的当前字节码指令地址，最好的办法自然就是为每一个线程都分配一个PC寄存器。这样各条线程之间计数器互不影响，独立存储。
@@ -134,7 +142,8 @@ JVM的字节码解释器就需要通过改变PC寄存器的值来明确下一条
 * 但微观上: 由于只有一个CPU，一次只能处理程序要求的一部分。如何公平处理？一种方法就是引入时间片，每个程序轮流执行。 
 
 
-* 并行: vs串行
+### CPU 时间片
+* 并行: 每个时刻，多个线程同时都在执行。 vs 串行
 * 并发: 比如一个CPU处理多个线程，看似并行处理，但实际上是并发，即每个时刻都只处理一个线程。
 
 

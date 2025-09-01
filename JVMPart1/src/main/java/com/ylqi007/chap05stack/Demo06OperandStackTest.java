@@ -1,12 +1,11 @@
-package com.atguigu;
+package com.ylqi007.chap05stack;
 
 /**
- * Description:
- *
+ * @Description: 操作数栈(Operand Stack)演示
  * @Author: ylqi007
- * @Create: 4/29/24 17:41
+ * @Create: 4/29/24 17:41， 2025/08/31
  */
-public class OperandStackTest {
+public class Demo06OperandStackTest {
     public void testAddOperation() {
         //byte、short、char、boolean：都以int型来保存
         byte i = 15;
@@ -38,7 +37,7 @@ public class OperandStackTest {
         int i1 = 10;
         i1++;
 
-        int i2 = 10;
+        int i2 = 20;
         ++i2;
 
         //第2类问题：

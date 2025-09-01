@@ -91,6 +91,7 @@
 ## 说明
 * 20250830，开始复习
 * Plugin: jclasslib
+* JVMPart1: Chap04,Chap05
 
 
 ## 关于 JDK8 和 JDK17 的选择

@@ -1,4 +1,4 @@
-package com.atguigu.java2;
+package com.ylqi007.chap05stack.dynamiclinking;
 
 /**
  * 体会invokedynamic指令
@@ -10,13 +10,13 @@ interface Func {
     public boolean func(String str);
 }
 
-public class Lambda {
+public class Demo03Lambda {
     public void lambda(Func func) {
         return;
     }
 
     public static void main(String[] args) {
-        Lambda lambda = new Lambda();
+        Demo03Lambda lambda = new Demo03Lambda();
 
         Func func = s -> {
             return true;

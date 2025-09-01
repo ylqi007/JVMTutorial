@@ -1,4 +1,4 @@
-package com.atguigu.java3;
+package com.ylqi007.chap05stack;
 
 /**
  * 虚方法表的举例
@@ -39,5 +39,5 @@ class CockerSpaniel extends Dog implements Friendly {
     }
 }
 
-public class VirtualMethodTable {
+public class Demo08VirtualMethodTable {
 }

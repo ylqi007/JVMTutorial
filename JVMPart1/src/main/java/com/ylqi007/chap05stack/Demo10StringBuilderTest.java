@@ -1,4 +1,4 @@
-package com.atguigu.java3;
+package com.ylqi007.chap05stack;
 
 /**
  * 面试题：
@@ -10,18 +10,20 @@ package com.atguigu.java3;
  * @author shkstart
  * @create 2020 下午 7:48
  */
-public class StringBuilderTest {
+public class Demo10StringBuilderTest {
 
     int num = 10;
 
-    //s1的声明方式是线程安全的
+    //s1的声明方式是线程安全的，只有一个线程可以操作此数据
     public static void method1(){
         //StringBuilder:线程不安全
+        // StringBuffer: 线程安全
         StringBuilder s1 = new StringBuilder();
         s1.append("a");
         s1.append("b");
         //...
     }
+
     //sBuilder的操作过程：是线程不安全的
     // sBuilder是共享数据，可能被多个线程共同操作
     public static void method2(StringBuilder sBuilder){
@@ -29,13 +31,15 @@ public class StringBuilderTest {
         sBuilder.append("b");
         //...
     }
-    //s1的操作：是线程不安全的
+
+    //s1的操作：是线程不安全的，因为被返回了，有可能被其他线程操作
     public static StringBuilder method3(){
         StringBuilder s1 = new StringBuilder();
         s1.append("a");
         s1.append("b");
         return s1;
     }
+
     //s1的操作：是线程安全的
     public static String method4(){
         StringBuilder s1 = new StringBuilder();
@@ -47,14 +51,11 @@ public class StringBuilderTest {
     public static void main(String[] args) {
         StringBuilder s = new StringBuilder();
 
-
         new Thread(() -> {
             s.append("a");
             s.append("b");
         }).start();
 
         method2(s);
-
     }
-
 }

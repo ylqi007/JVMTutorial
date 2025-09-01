@@ -17,8 +17,6 @@
     <modules>
         <module>Chapter01</module>
         <module>Chapter02</module>
-        <module>Chapter04</module>
-        <module>Chapter05</module>
         <module>Chapter06</module>
         <module>Chapter08</module>
         <module>Chapter09</module>
@@ -29,6 +27,7 @@
         <module>Chapter15</module>
         <module>Chapter16</module>
         <module>Chapter17</module>
+        <module>JVMPart1</module>
     </modules>
     <properties>
         <java.version>1.8</java.version>

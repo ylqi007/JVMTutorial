@@ -1,11 +1,11 @@
-package com.atguigu.java2;
+package com.ylqi007.chap05stack.dynamiclinking;
 
 /**
  * 说明早期绑定和晚期绑定的例子
  * @author shkstart
  * @create 2020 上午 11:59
  */
-public class AnimalTest {
+public class Demo01AnimalTest {
     public void showAnimal(Animal animal){  // Animal为父类
         animal.eat();   //表现为：晚期绑定
     }

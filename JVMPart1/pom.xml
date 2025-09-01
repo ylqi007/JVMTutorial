@@ -9,8 +9,8 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.atguigu</groupId>
-    <artifactId>Chapter05</artifactId>
+    <groupId>com.ylqi007</groupId>
+    <artifactId>JVMPart1</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

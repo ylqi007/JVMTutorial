@@ -1,22 +1,40 @@
 # Chapter05 虚拟机栈
 
 ## 1. 虚拟机栈概述
+> 2.5.2. Java Virtual Machine Stacks
+> 
+> Each Java Virtual Machine thread has a private Java Virtual Machine stack, created at the same time as the thread. A Java Virtual Machine stack stores frames (§2.6). A Java Virtual Machine stack is analogous to the stack of a conventional language such as C: it holds local variables and partial results, and plays a part in method invocation and return. Because the Java Virtual Machine stack is never manipulated directly except to push and pop frames, frames may be heap allocated. The memory for a Java Virtual Machine stack does not need to be contiguous.
+> 
+> In the First Edition of The Java® Virtual Machine Specification, the Java Virtual Machine stack was known as the Java stack.
+> 
+> This specification permits Java Virtual Machine stacks either to be of a fixed size or to dynamically expand and contract as required by the computation. If the Java Virtual Machine stacks are of a fixed size, the size of each Java Virtual Machine stack may be chosen independently when that stack is created.
+> 
+> A Java Virtual Machine implementation may provide the programmer or the user control over the initial size of Java Virtual Machine stacks, as well as, in the case of dynamically expanding or contracting Java Virtual Machine stacks, control over the maximum and minimum sizes.
+> 
+> The following exceptional conditions are associated with Java Virtual Machine stacks:
+> * If the computation in a thread requires a larger Java Virtual Machine stack than is permitted, the Java Virtual Machine throws a StackOverflowError.
+> * If Java Virtual Machine stacks can be dynamically expanded, and expansion is attempted but insufficient memory can be made available to effect the expansion, or if insufficient memory can be made available to create the initial Java Virtual Machine stack for a new thread, the Java Virtual Machine throws an OutOfMemoryError.
+
+
 ### 1.1 虚拟机栈出现的背景
-由于跨平台性的设计，Java的指令都是根据**栈**来设计的。不同平台CPU架构不同，所以不能设计为基于寄存器的。
+由于**跨平台性**的设计，Java的指令都是根据**栈**来设计的。不同平台CPU架构不同，所以不能设计为基于寄存器的。
 
 优点是跨平台，指令集小，编译器容易实现；缺点是性能下降，实现同样的功能需要更多的指令。
 
+
 ### 1.2 初步印象
-不少Java开发人员一提到Java内存结构，就会非常粗粒度地将JVM中的内存区域理解为仅有Java堆(heap)和Java栈(stack)？为什么？
+不少Java开发人员一提到Java内存结构，就会非常粗粒度地将JVM中的内存区域理解为仅有Java堆(`heap`)和Java栈(`stack`)？为什么？
+
 
 ### 1.3 内存中的栈和堆
-**栈是运行时的单位，而堆是存储的单位。**即
-* 栈解决程序的运行问题，即程序如何执行，或者说如何处理数据。
-* 堆解决的是数据存储的问题，即数据怎么放，放在哪儿
+**栈是运行时的单位，而堆是存储的单位**。即
+* 栈(`stack`)解决程序的运行问题，即程序如何执行，或者说如何处理数据。
+* 堆(`heap`)解决的是数据存储的问题，即数据怎么放，放在哪儿
+
 
 ### 1.4 虚拟机栈基本内容
 Java虚拟机栈是什么？
-* Java虚拟机栈(Java Virtual Machine Stack)，早期也叫做Java栈，每个线程在创建时都会创建一个虚拟机栈，其内部保存一个个的**栈帧(Stack Frame)**，对应着一次次的Java方法调用。
+* Java虚拟机栈(Java Virtual Machine Stack)，早期也叫做Java栈，**每个线程在创建时都会创建一个虚拟机栈**，其内部保存一个个的**栈帧(Stack Frame)**，对应着一次次的Java方法调用。
 * 是线程私有的。
 
 **生命周期:** 生命周期和线程一致。
@@ -33,7 +51,8 @@ Java虚拟机栈是什么？
   2. 执行结束后的出栈工作
 * 对于栈来说，不存在垃圾回收问题。
 
-#### 面试题: 开发中遇到的异常有哪些？
+
+### 面试题: 开发中遇到的异常有哪些？
 **栈中可能出现的异常:**
 * Java虚拟机规范允许Java栈的大小是动态的或者是固定不变的。
   * 如果采用**固定大小**的Java虚拟机栈，那每一个线程的Java虚拟机栈容量可以在线程创建的时候独立选定。如果线程请求分配的栈容量超过Java虚拟机栈允许的最大容量，Java虚拟机将会抛出一个`java.lang.StackOverflowError`异常。
@@ -55,17 +74,21 @@ Sets the thread stack size (in bytes). Append the letter k or K to indicate KB, 
 > ```
 > This option is similar to -XX:ThreadStackSize.
 
+* https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html (单位是byte, B)
+* https://docs.oracle.com/en/java/javase/17/docs/specs/man/java.html (单位是byte, B)
+
 
 ## 2. 栈的存储单位
 ### 2.1 栈中存储什么？
-* 每个线程都有自己的栈，栈中的数据都是以**栈帧(Stack Frame)**的格式存在。
+* 每个线程都有自己的栈，栈中的数据都是以**栈帧**(Stack Frame)的格式存在。
 * 在这个线程上正在执行的每个方法都各自对应一个**栈帧(Stack Frame)**
 * 栈帧是一个内存区块，是一个数据集，维系着方法执行过程中的各种数据信息。
 
+
 ### 2.2 栈运行原理
-* JVM直接对Java栈的操作只有两个，就是对栈帧的压栈和出栈，遵循**"先进后出"**的原则。
+* JVM直接对Java栈的操作只有两个，就是对栈帧的压栈和出栈，遵循"**先进后出**"的原则。
 * 在一条活动线程中，一个时间点上，只会有一个活动的栈帧。即只有当前正在执行的方法的栈帧(栈顶栈帧)是有效的，这个栈帧被称为当前栈帧(Current Frame)，与当前栈帧相对应的方法就是当前方法(Current Method)，定义这个方法的类就是当前类(Current Class)。
-* 执行引擎运行的所有字节码指令只针对当前栈帧进行操作。
+* **执行引擎运行的所有字节码指令只针对当前栈帧进行操作**。
 * 如果在该方法中调用了其他方法，对应的新的栈帧会被创建出来，放在栈的顶端，称为新的当前栈帧。
 * 不同线程中所包含的栈帧是不允许存在相互引用的，即不可能在一个栈帧中引用另一个线程的栈帧。
 * 如果当前方法调用了其他方法，方法返回之际，当前栈帧会传回此方法的执行结果给前一个栈帧，接着，虚拟机会丢弃当前栈帧，使得前一个栈帧重新成为当前栈帧。
@@ -76,6 +99,7 @@ Sets the thread stack size (in bytes). Append the letter k or K to indicate KB, 
 <img src="JVM.Images.I/第05章_方法_栈帧_栈桢内部结构.jpg">
 
 <img src="JVM.Images.I/第05章_StackFrameTest.png">
+
 
 ### 2.3 栈帧的内部结构
 <img src="JVM.Images.I/第05章_运行时数据区_栈帧.webp">
@@ -91,7 +115,7 @@ Sets the thread stack size (in bytes). Append the letter k or K to indicate KB, 
 在编译程序代码时，栈帧中需要多大的局部变量表，多深的操作数栈都已经完全确定了，并且写在方法表的Code属性中。
 
 
-## 3. 局部变量表(Local Variables)
+## 3. 局部变量表(Local Variables, 本地变量表)
 ### 3.1 什么是局部变量表
 * 局部变量表也被称之为局部变量数组或本地变量表
   * Local Variables: 局部变量表，本地变量表
@@ -103,6 +127,7 @@ Sets the thread stack size (in bytes). Append the letter k or K to indicate KB, 
   * 在方法执行时，虚拟机通过使用局部变量表完成参数值到参数变量表的传递过程。
   * 当方法调用结束后，随着方法栈的销毁，局部变量表也会随之销毁。
 
+
 #### 1. 局部变量表结构的认识+内部剖析
 <img src="JVM.Images.I/第05章_局部变量表_main_0.png">
 <img src="JVM.Images.I/第05章_局部变量表_main_1.png">
@@ -111,12 +136,13 @@ Sets the thread stack size (in bytes). Append the letter k or K to indicate KB, 
 <img src="JVM.Images.I/第05章_局部变量表_main_4.png">
 <img src="JVM.Images.I/第05章_局部变量表_main_5.png">
 
+
 ### 3.2 变量槽slot的理解与演示
 * 参数值的存放总是在局部变量数组的index0开始，到数组长度-1的索引结束。
-* 局部变量表，最基本的存储单元是Slot(变量槽)
+* 局部变量表(LocalVariableTable)，最基本的存储单元是Slot(变量槽)
 * 局部变量表中存放编译期可知的各种基本数据类型(8种)，引用类型(reference)，returnAddress类型的变量。
 * 在局部变量表里，32位以内的类型只占用一个Slot(包括returnAddress类型)，64位的类型(long和double)占用两个slot。
-  * byte、short、char在存储前被转换为int，boolean也被转换为int，0表示false，非0表示true。
+  * byte、short、char、float在存储前被转换为int，boolean也被转换为int，0表示false，非0表示true。
   * float也是一个slot
   * long和double则占据两个slot
 * JVM会为局部变量表中的每一个slot都分配一个访问索引，通过这个索引即可成功访问到局部变量表中指定的局部变量值。
@@ -127,12 +153,25 @@ Sets the thread stack size (in bytes). Append the letter k or K to indicate KB, 
 * <img src="JVM.Images.I/第05章_局部变量表_slot_2.png">
 * <img src="JVM.Images.I/第05章_局部变量表_slot_4.png">
 
+
 #### 1. Slot的重复利用
 * 栈帧中的局部变量表中的槽位是可以重复用的，如果一个局部变量表过了其作用域，那么在其作用域之后申明的新的局部变量就很有可能会复用过期的局部变量的槽位，从而达到节省资源的目的。
 * `com.atguigu.LocalVariablesTest.test4`
+* [Demo05LocalVariablesTest.java](../JVMPart1/src/main/java/com/ylqi007/chap05stack/Demo05LocalVariablesTest.java) `test4()`
 * <img src="JVM.Images.I/第05章_局部变量表_slot_3.png">
 
+
 #### 2. 举例: 静态变量与局部变量的对比
+变量分类1: 按照数据类型分
+1. 基本数据类型
+2. 引用数据类型
+
+变量分类2: 按照在类中声明的位置
+1. 成员变量(在使用前，都经历过初始化赋值): 
+   * 类变量(`static`): 在 Linking 的 prepare 阶段，给类变量默认赋值 --> Initialization 阶段，给变量显示赋值，即静态代码块赋值 
+   * 实例变量: 随着对象的创建，会在堆(heap)空间中分配实例变量空间，并进行默认赋值
+2. 局部变量: 在使用前，必须要进行显示赋值！否则，编译不通过
+
 * 参数表分配完毕后，再根据方法体内定义的变量的顺序和作用域分配。
 * 变量表由两次初始化的机会，第一次是在“准备阶段”，执行系统初始化，对类变量设置零值，另一次是在“初始化”阶段，赋予程序员在代码中定义的初始值。
 * 和类变量初始化不同的是，局部变量表不存在系统初始化的过程，这意味着一旦定义了局部变量则必须人为的初始化，否则无法使用。
@@ -146,7 +185,7 @@ Sets the thread stack size (in bytes). Append the letter k or K to indicate KB, 
 
 ### 3.3 补充说明
 * 在栈帧中，与性能调优关系最为密切的部分就是局部变量表。在方法执行时，虚拟机使用局部变量表完成方法的传递。
-* 局部变量表中的变量也是重要的垃圾回收跟节点，只要被局部变量表中直接或间接引用的对象都不会被回收。
+* ✅ 局部变量表中的变量也是重要的**垃圾回收根节点**，只要被局部变量表中直接或间接引用的对象都不会被回收。
 
 
 ## 4. 操作数栈(Operand Stack)
@@ -160,11 +199,12 @@ Sets the thread stack size (in bytes). Append the letter k or K to indicate KB, 
   * 比如：执行复制、交换、求和等操作。
 * 操作数栈，主要用于保存计算过程的中间结果，同时作为计算过程中变量临时的存储空间。
 * 操作数栈就是JVM执行引擎的一个工作区，当一个方法刚开始执行的时候，一个新的帧栈也会随之被创建出来，这个方法的操作数栈是空的。
+  * 数组一旦创建，其长度是确定的！
 * 每个操作数栈都会拥有一个明确的栈深度用于存储数值，其需要的最大深度在编译期就定义好了，保存在方法的Code属性中，为`max_stack`的值。
 * 栈中的任何一个元素都是可以任意的Java数据类型
   * 32bit的类型占用一个栈单位深度
   * 64bit的类型占用两个栈单位深度
-* 操作数栈并非采用访问索引的方式来进行数据的访问的，而是只能通过标准的入栈(push)和出栈(pop)操作来完成一次数据访问。
+* **操作数栈并非采用访问索引的方式来进行数据的访问的，而是只能通过标准的入栈(push)和出栈(pop)操作来完成一次数据访问**。
 * 如果被调用的方法带有返回值的话，其返回值将会被压入当前栈帧的操作数栈中，并更新PC寄存器中下一条需要执行的字节码指令。
 * 操作数栈中元素的数据类型必须与字节码指令的序列严格匹配，这由编译器在编译期间进行验证。同时在类加载过程中的类校验阶段的数据流分析阶段要再次验证。
 * 另外，Java虚拟机的解释引擎是基于栈的执行引擎，其中的栈指的就是操作数栈。
@@ -211,7 +251,7 @@ public class OperandStackTest {
 程序员面试中，常见的`i++`和`++i`的区别，放到字节码篇章中再介绍。
 
 
-## 6. 栈顶缓存技术
+## 6. 栈顶缓存(Top-of-Stack Caching)技术
 基于栈式架构的虚拟机所使用的零地址指令更加紧凑，但完成一项操作的时候需要使用更多的入栈和出栈指令，这同时也就意味着需要将更多的指令分派(instruction dispatch)次数和内存读/写次数。
 
 由于操作数是存储在内存中的，因此频繁地执行内存读/写操作必然会影响执行速度。为了解决这个问题，HotSpot JVM的设计者们提出了栈顶缓存(ToS, Top-of-Stack Caching)技术，将栈顶元素全部缓存在物理CPU的寄存器中，以此降低对内存的读/写次数，提高执行引擎的执行效率。
@@ -230,7 +270,7 @@ public class OperandStackTest {
 **动态链接的图示说明:**
 <img src="JVM.Images.I/第05章_动态链接.png">
 
-* 上图中蓝色栈帧中的橘色部分即为动态链接(i.e.指向运行时常量池中的方法引用)。
+* 上图中蓝色栈帧中的橘色部分即为动态链接(i.e.指向**运行时常量池**中的方法引用)。
 * 字节码中的常量池信息(Constant pool)会在加载的时候被加载到方法区，也就是上图中的运行时常量区。
 * 一个类的class文件会被加载到Method Area，其中包括类型信息，域信息，方法信息，和运行时常量池等。
 
@@ -283,7 +323,7 @@ Java中任何一个普通的方法其实都具备虚函数的特征，它们相�
   1. `invokestatic`: 调用静态方法，解析阶段确定唯一方法体。(非虚方法)
   2. `invokespecial`: 调用<init>方法、私有及父类方法，解析阶段确定唯一方法版本。(非虚方法)
   3. `invokevirtual`: 调用所有虚方法。
-     * final修饰的方法也是`invokevirtual`调用的，但是这类方法并不是虚方法
+     * `final`修饰的方法也是`invokevirtual`调用的，但是这类方法并不是虚方法
   4. `invokeinterface`: 调用接口方法。
 * 动态调用指令:
   1. `invokedynamic`: 动态解析出需要调用的方法，然后执行。
@@ -345,7 +385,7 @@ Java语言中方法重写(`@Override`)的本质:
 
 
 ## 9 方法返回地址(Return Address)
-* 存放调用该方法的pc寄存器的值。
+* **存放调用该方法的pc寄存器的值**。
 * 一个方法的结束，有两种方式:
   * 正常执行完成
   * 出现未处理的异常，非正常退出

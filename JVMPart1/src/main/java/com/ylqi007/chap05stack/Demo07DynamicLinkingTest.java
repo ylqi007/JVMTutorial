@@ -1,12 +1,12 @@
-package com.atguigu.java1;
+package com.ylqi007.chap05stack;
 
 /**
- * Description:
+ * @Description: 动态连接演示
  *
  * @Author: ylqi007
  * @Create: 5/1/24 08:09
  */
-public class DynamicLinkingTest {
+public class Demo07DynamicLinkingTest {
     int num = 10;
 
     public void methodA() {
