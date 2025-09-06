@@ -4,6 +4,7 @@
 <img src="JVM.Images.I/JVM_Runtime.Data.Area.png">
 <img src="JVM.Images.I/第09章_JVM_内存区域.png">
 
+* 线程共享的区域：堆(heap)和元空间(meta space)
 * 堆、元空间，既有GC又有OOM
 * 虚拟机栈、本地方法栈，有StackOverflowError，没有GC
 * 程序计数器，既没有异常，也没有GC
@@ -11,8 +12,9 @@
 <img src="JVM.Images.I/第09章_交互关系.png" alt="">
 
 * `Person`类的结构加载到方法区
-* `person`变量加载到Java虚拟机栈
+* `person`变量加载到Java虚拟机栈, frame 的LocalVariableTable 中
 * `new Person();`创建出的实例位于堆中
+
 
 ## 9.2 方法区的理解
 ### 9.2.1 方法区在哪里？
@@ -29,22 +31,40 @@
   * 加载大量的第三方的jar包；Tomcat部署的工程过多(30-50个)；大量动态地生成反射类
 * 关闭JVM就会释放这个区域的内存
 
+
 ### 9.2.2 HotSpot中方法区的演进
-* 在JDK7及以前，习惯上把方法区，称为永久代。从JDK8开始，使用"元空间"取代了"永久代"。
+* 在JDK7及以前，习惯上把方法区，称为**永久代**。从JDK8开始，使用"元空间"取代了"永久代"。
   * <img src="JVM.Images.I/第09章_方法区实现对比.png">
 * 本质上，方法区和永久代并不等价。仅是对HotSpot而言。《Java虚拟机规范》对如何实现方法区，不做统一要求。例如: BEA JRockit/IBM J9中不存在永久代的概念。
   * 现在看来，当年使用永久代，不是好的idea。导致Java程序更容易OOM(超过`-XX:MaxPermSize`上限)
-* 而到了JDK8，终于完全废弃了永久代的概念，该用与JRockit、J9一样的本地内存实现的元空间(Metaspace)来替代
+* 而到了JDK8，终于完全废弃了永久代的概念，该用与JRockit、J9一样的**本地内存实现的元空间**(Metaspace)来替代
 * 元空间的本质和永久代类似，都是对JVM虚拟机规范中方法区的实现。不过元空间与永久代最大的区别在于: **元空间不在虚拟机设置的内存中，而是使用了本地内存。**
 * 永久代、元空间二者并不只是名字变了，内部结构也调整了。
   * <img src="JVM.Images.I/第09章_永久代与元空间变动.png">
 * 根据《Java虚拟机规范》的规定，如果方法区无法满足新的内存分配需求时，将抛出OOM异常。
 
+```shell
+➜  ~ jps
+32553 Main
+51945 Launcher
+51946 Demo01MethodArea
+90543 Main
+52335 Jps
+➜  ~
+➜  ~ jinfo -flag MetaspaceSize 51946
+-XX:MetaspaceSize=21807104
+➜  ~
+➜  ~ jinfo -flag MaxMetaspaceSize 51946
+-XX:MaxMetaspaceSize=18446744073709535232
+```
+* 21807104 (Bytes) = 20 * 1024 * 1024 (B) = 20 * 1024 (KB) = 20 (MB)
+* 18446744073709535232 (Bytes) ~= 16EB
+
 
 ## 9.3 设置方法区大小与OOM
 ### 9.3.1 方法区大小设置
 方法区的大小不必是固定的，JVM可以根据应用的需要动态调整。
-* JDK7及以前
+* JDK7及以前: `-XX:PermSize=100m -XX:MaxPermSize=100m`
 * JDK8及以后
   * 元数据区大小可以使用参数`-XX:MetaspaceSize`和`-XX:MaxMetaspaceSize`指定，替代上述原有的两个参数。
   * 默认值依赖于平台。Windows下，`-XX:MetaspaceSize`是21M，`-XX:MaxMetaspaceSize`的值是-1，即没有限制。
@@ -76,7 +96,7 @@
 <img src="JVM.Images.I/第09章_方法区简图.png">
 
 ### 9.4.1 方法区(Method Area)存储了什么？
-* 《深入理解Java虚拟机》书中对方法区(Method Area)存储内容描述如下: 它用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等。
+* 《深入理解Java虚拟机》书中对方法区(Method Area)存储内容描述如下: **它用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等**。
   * <img src="JVM.Images.I/第09章_方法区存储信息.jpg">
   
 1. **类型信息**: 对每个加载的类型(类class，接口interface，枚举enum，注解annotation)，JVM必须在方法区中存储以下类型信息:
@@ -213,5 +233,6 @@ JDK7中将StringTable放到了堆空间中。因为永久代的回收效率很�
 ## Reference
 * 官方文档: https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html#jvms-2.5.4
 * 官方文档: https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html (`-XX:PermSize=size, -XX:MetaspaceSize=size`)
+* https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html
 * 官方文档 The class File Format: https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html
 * https://openjdk.org/jeps/122
