@@ -1,4 +1,4 @@
-package com.atguigu.java;
+package com.ylqi007.chap11directmemory.java;
 
 import sun.misc.Unsafe;
 
@@ -28,4 +28,7 @@ Exception in thread "main" java.lang.OutOfMemoryError
 	at sun.misc.Unsafe.allocateMemory(Native Method)
 	at com.atguigu.java.MaxDirectMemorySizeTest.main(MaxDirectMemorySizeTest.java:20)
 
+Exception in thread "main" java.lang.OutOfMemoryError
+	at sun.misc.Unsafe.allocateMemory(Native Method)
+	at com.ylqi007.chap11directmemory.java.MaxDirectMemorySizeTest.main(MaxDirectMemorySizeTest.java:20)
  */

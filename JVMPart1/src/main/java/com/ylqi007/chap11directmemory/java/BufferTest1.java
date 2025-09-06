@@ -1,4 +1,4 @@
-package com.atguigu.java;
+package com.ylqi007.chap11directmemory.java;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

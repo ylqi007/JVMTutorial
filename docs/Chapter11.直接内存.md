@@ -18,3 +18,5 @@
   * 如果不指定，默认与堆的最大值`-Xmx`参数值一致
 
 <img src="JVM.Images.I/第11章_JVM内存结构.png">
+
+简单理解：java process memory = java heap + native memory
