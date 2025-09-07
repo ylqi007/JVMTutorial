@@ -39,3 +39,7 @@ build/
 
 ### MacOS ###
 **/.DS_Store
+
+
+### 测试数据
+words.txt
