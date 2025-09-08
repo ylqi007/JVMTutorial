@@ -1,7 +1,7 @@
 # ReadMe
 
 ## 课程结构
-1. Part1: 内存与垃圾回收篇
+1. Part1: 内存与垃圾回收篇 1~203
    1. [Chapter12.执行引擎.md](docs/Chapter12.%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E.md)
    2. [Chapter13.String底层说明.md](docs/Chapter13.String%E5%BA%95%E5%B1%82%E8%AF%B4%E6%98%8E.md)
 2. Part2: 字节码和类的加载篇
