@@ -1,7 +1,7 @@
 # Chapter01. JVM与Java体系结构
 
 ## 1. 前言
-<img src="JVM.Images.I/第01章_概述01.png" width="800">
+<img src="JVMPart1.Images/第01章_概述01.png" width="800">
 
 大部分Java开发人员，除会在项目中使用到与Java平台相关的各种高精尖技术，对于Java技术的核心Java虚拟机了解甚少。
 
@@ -9,7 +9,7 @@
 * 一些有一定工作经验的开发人员，打心眼儿里觉得SSM、微服务等上层技术才是重点，基础技术并不重要，这其实是一种**本末倒置**的“病态”。
 * 如果我们把核心类库的API比做数学公式的话，那么**Java虚拟机**的知识就好比公式的推导过程。
 
-<img src="JVM.Images.I/第01章_概述02.png" width="800">
+<img src="JVMPart1.Images/第01章_概述02.png" width="800">
 
 计算机系统体系对我们来说越来越远，在不了解底层实现方式的前提下，通过高级语言很容易编写程序代码。但事实上计算机并不认识高级语言。
 
@@ -38,7 +38,7 @@
   * 比如：垃圾回收算法、JIT（及时编译器）、底层原理
 
 ### 1.4 Java 🆚 C++
-<img src="JVM.Images.I/第01章_Java-vs-C++.jpg">
+<img src="JVMPart1.Images/第01章_Java-vs-C++.jpg">
 
 垃圾收集机制为我们打理了很多繁琐的工作，大大提高了开发的效率，但是，垃圾收集也不是万能的，懂得JVM内部的内存结构、工作机制，是设计高扩展性应用和诊断运行时问题的基础，也是Java工程师进阶的必备能力。
 
@@ -62,7 +62,7 @@ Java是目前应用最为广泛的软件开发平台之一。随着 Java 以及 
 
 作为一个社区，Java 拥有全世界最多的技术拥护者和开源社区支持，有数不清的论坛和资料。从桌面应用软件、嵌入式开发到企业级应用、后台服务器、中间件，都可以看到 Java 的身影。其应用形式之复杂、参与人数之众多也令人咂舌。
 
-<img src="JVM.Images.I/第01章_Java语言的跨平台性.jpg" width="800" alt="">
+<img src="JVMPart1.Images/第01章_Java语言的跨平台性.jpg" width="800" alt="">
 
 * Write once, run anywhere.
 * Java程序会转换成字节码文件，转换成的字节码文件通过Java虚拟机运行和处理。
@@ -70,7 +70,7 @@ Java是目前应用最为广泛的软件开发平台之一。随着 Java 以及 
 ### 3.3 Java虚拟机规范
 
 ### 3.4 JVM: 跨平台的语言
-<img src="JVM.Images.I/第01章_JVM跨语言的平台.jpg" width="800">
+<img src="JVMPart1.Images/第01章_JVM跨语言的平台.jpg" width="800">
 
 * JVM的起始原材料是字节码文件
 * 字节码文件可以由不同的语言提供，不同的语言提供各自的编译器，编译生成的字节码遵循JVM的规范，则字节码文件就可以在JVM上运行。
@@ -132,7 +132,7 @@ Java虚拟机是一台**执行Java字节码**的虚拟计算机，它拥有独�
 ### 5.3 JVM的位置
 JVM是运行在操作系统之上的，它与硬件没有直接的交互
 
-<img src="JVM.Images.I/第01章_JVM所处位置.jpg" width="800">
+<img src="JVMPart1.Images/第01章_JVM所处位置.jpg" width="800">
 
 * 最底层的是硬件，比如Intel or AMD的CPU。
 * 操作系统，比如Windows/Linux。
@@ -140,7 +140,7 @@ JVM是运行在操作系统之上的，它与硬件没有直接的交互
 
 Java的体系结构
 
-<img src="JVM.Images.I/第01章_Java_Conceptual_Diagram.png" width="800">
+<img src="JVMPart1.Images/第01章_Java_Conceptual_Diagram.png" width="800">
 
 JDK是用于支持Java程序开发的最小环境，包含以下三个部分
 1. Java虚拟机 (最底层的基础)
@@ -156,7 +156,7 @@ JRE包含以下两个部分:
 * HotSpot VM是目前市面上高性能JVM的代表作之一。它采用**解释器**与**即时编译器**并存的架构。
 * 现如今，Java程序的运行性能已经达到可以与C/C++程序一较高下的地步了。
 
-<img src="JVM.Images.I/第02章_JVM架构-简图.jpg" width="800">
+<img src="JVMPart1.Images/第02章_JVM架构-简图.jpg" width="800">
 
 整体上看，上图分为三层:
 1. 加载class files -- 类装载子系统
@@ -176,7 +176,7 @@ JRE包含以下两个部分:
 * 一个 JVM 对应一个运行时数据区，对应的类就是 Runtime 类，它是单例的
   
 ## 7. Java代码执行流程
-<img src="JVM.Images.I/第01章_Java代码执行流程.png">
+<img src="JVMPart1.Images/第01章_Java代码执行流程.png">
 
 1. Java文件(.java) --(前端编译器)--> 字节码文件
 2. 字节码在JVM中运行

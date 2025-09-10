@@ -10,8 +10,8 @@ JVM架构简图(中/英)
 3. 执行引擎 (Execution Engine)
 
 JVM架构详图(中，英)
-* <img src="JVM.Images.I/第02章_JVM架构-中.jpg">
-* <img src="JVM.Images.I/第02章_JVM架构-英.jpg">
+* <img src="JVMPart1.Images/第02章_JVM架构-中.jpg">
+* <img src="JVMPart1.Images/第02章_JVM架构-英.jpg">
 
 1. 简图
 2. 详细图（中，英）
@@ -23,7 +23,7 @@ JVM架构详图(中，英)
 2. 链接, Linking
 3. 初始化, Initialization
 
-<img src="JVM.Images.I/第02章_类加载器子系统_1.png">
+<img src="JVMPart1.Images/第02章_类加载器子系统_1.png">
 
 * **类加载器子系统**负责从文件系统或者网络中加载class文件，class文件在文件开头有特定的**文件标识(`0xCAFEBABE`)**。任何语言都可以考虑使用特定的编译器生成符合Java虚拟机规范的class文件。
 * Class Loader只负责加载class文件，至于class文件是否可以运行，则由Execution Engine决定。
@@ -36,7 +36,7 @@ JVM架构详图(中，英)
 3. 在class文件-->JVM-->最终成为元数据模板，此过程需要一个运输工具(类加载器,Class Loader)，扮演一个快递员的角色。
 4. 通过`getClassLoader()`方法可以获取是谁加载的这个类。
 
-<img src="JVM.Images.I/第02章_类加载器_ClassLoader.jpg">
+<img src="JVMPart1.Images/第02章_类加载器_ClassLoader.jpg">
 
 
 ### 2.3 类的加载过程
@@ -55,7 +55,7 @@ public class HelloLoader {
 }
 ```
 
-<img src="JVM.Images.I/第02章_类的加载过程.jpg">
+<img src="JVMPart1.Images/第02章_类的加载过程.jpg">
 
 * 如果class `HelloLoader`没有被加载到JVM中，则需要对`HelloLoader`进行加载，然后才能创建实例。
 * 完整的流程包含:
@@ -117,7 +117,7 @@ public class HelloLoader {
   * Bootstrap Class Loader
   * Extension Class Loader: `sun.misc.Launcher.ExtClassLoader`
   * System Class Loader: `sun.misc.Launcher.AppClassLoader`
-  * <img src="JVM.Images.I/第02章_类加载器关系.webp">
+  * <img src="JVMPart1.Images/第02章_类加载器关系.webp">
   * Bootstrap 是一类, 即上图中的 Bootstrap ClassLoader
   * 其他的是一类, 即上图中除了 Bootstrap ClassLoader 之外的所有加载器
   * 它们四者之间的关系是**包含关系**。不是上下层，也不是子父类的继承关系。
@@ -173,7 +173,7 @@ public class HelloLoader {
 ### 2.5 `java.lang.ClassLoader`的使用说明
 `ClassLoader`是一个抽象类，其后的所有类加载器都继承此类。
 * `java.lang.ClassLoader`
-* <img src="JVM.Images.I/第02章_ClassLoader.webp"> 
+* <img src="JVMPart1.Images/第02章_ClassLoader.webp"> 
 * 注: 这些方法都不是抽象方法
 
 **实例:**
@@ -186,7 +186,7 @@ public class HelloLoader {
 
 
 ### 3.1 双亲委派机制原理
-<img src="JVM.Images.I/第02章_双亲委派机制.jpeg">
+<img src="JVMPart1.Images/第02章_双亲委派机制.jpeg">
 
 * 如果这个父亲加载器收到了类加载的请求，它不会自己加载，而是先把这个请求给自己的父类加载器去执行。
 * 如果这个父类加载器还有父类加载器，则会再将请求给自己的父类加载器，依次递归到顶层的启动类加载器。
@@ -195,7 +195,7 @@ public class HelloLoader {
 
 
 ### 3.2 双亲委派机制举例2
-<img src="JVM.Images.I/第02章_双亲委派机制.png">
+<img src="JVMPart1.Images/第02章_双亲委派机制.png">
 
 
 ### 3.3 双亲委派机制优势

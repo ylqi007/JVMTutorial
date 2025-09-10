@@ -1,15 +1,15 @@
 # Chapter09. 方法区
 
 ## 9.1 栈、堆、方法区的交互关系
-<img src="JVM.Images.I/JVM_Runtime.Data.Area.png">
-<img src="JVM.Images.I/第09章_JVM_内存区域.png">
+<img src="JVMPart1.Images/JVM_Runtime.Data.Area.png">
+<img src="JVMPart1.Images/第09章_JVM_内存区域.png">
 
 * 线程共享的区域：堆(heap)和元空间(meta space)
 * 堆、元空间，既有GC又有OOM
 * 虚拟机栈、本地方法栈，有StackOverflowError，没有GC
 * 程序计数器，既没有异常，也没有GC
 
-<img src="JVM.Images.I/第09章_交互关系.png" alt="">
+<img src="JVMPart1.Images/第09章_交互关系.png" alt="">
 
 * `Person`类的结构加载到方法区
 * `person`变量加载到Java虚拟机栈, frame 的LocalVariableTable 中
@@ -22,7 +22,7 @@
 
 **所以，方法区看作是一块独立于Java堆的内存空间。**
 
-<img src="JVM.Images.I/第02章_JVM架构-简图.jpg">
+<img src="JVMPart1.Images/第02章_JVM架构-简图.jpg">
 
 * 方法区与Java堆一样，是各个线程共享的内存区域。
 * 方法区在JVM启动的时候被创建，并且它的实际的物理内存空间中和Java堆区一样都可以是不连续的。
@@ -34,13 +34,13 @@
 
 ### 9.2.2 HotSpot中方法区的演进
 * 在JDK7及以前，习惯上把方法区，称为**永久代**。从JDK8开始，使用"元空间"取代了"永久代"。
-  * <img src="JVM.Images.I/第09章_方法区实现对比.png">
+  * <img src="JVMPart1.Images/第09章_方法区实现对比.png">
 * 本质上，方法区和永久代并不等价。仅是对HotSpot而言。《Java虚拟机规范》对如何实现方法区，不做统一要求。例如: BEA JRockit/IBM J9中不存在永久代的概念。
   * 现在看来，当年使用永久代，不是好的idea。导致Java程序更容易OOM(超过`-XX:MaxPermSize`上限)
 * 而到了JDK8，终于完全废弃了永久代的概念，该用与JRockit、J9一样的**本地内存实现的元空间**(Metaspace)来替代
 * 元空间的本质和永久代类似，都是对JVM虚拟机规范中方法区的实现。不过元空间与永久代最大的区别在于: **元空间不在虚拟机设置的内存中，而是使用了本地内存。**
 * 永久代、元空间二者并不只是名字变了，内部结构也调整了。
-  * <img src="JVM.Images.I/第09章_永久代与元空间变动.png">
+  * <img src="JVMPart1.Images/第09章_永久代与元空间变动.png">
 * 根据《Java虚拟机规范》的规定，如果方法区无法满足新的内存分配需求时，将抛出OOM异常。
 
 ```shell
@@ -93,11 +93,11 @@
 
 
 ## 9.4 方法区的内部结构
-<img src="JVM.Images.I/第09章_方法区简图.png">
+<img src="JVMPart1.Images/第09章_方法区简图.png">
 
 ### 9.4.1 方法区(Method Area)存储了什么？
 * 《深入理解Java虚拟机》书中对方法区(Method Area)存储内容描述如下: **它用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等**。
-  * <img src="JVM.Images.I/第09章_方法区存储信息.jpg">
+  * <img src="JVMPart1.Images/第09章_方法区存储信息.jpg">
   
 1. **类型信息**: 对每个加载的类型(类class，接口interface，枚举enum，注解annotation)，JVM必须在方法区中存储以下类型信息:
    1. 这个类型的完整有效名称(全名=包名.类名)
@@ -143,7 +143,7 @@
 
 #### 为什么需要常量池？
 一个Java源文件中的类、接口，编译后产生一个字节码文件。而Java中的字节码需要数据支持，通常这种数据会很大以至于不能直接存到字节码里，换另一种方式，可以存到常量池，这个字节码包含了指向常量池的引用。在动态链接的时候会用到运行时常量池。
-* <img src="JVM.Images.I/第09章_常量池.png">
+* <img src="JVMPart1.Images/第09章_常量池.png">
 
 #### 常量池小结
 常量池，可以看作是一张表，虚拟机指令根据这种常量表找到要执行的类名、方法名、参数类型、字面量等类型。
@@ -170,7 +170,7 @@
    1. jdk1.6及之前: 有永久代(permanent generation)，静态变量存放在永久代上。
    2. jdk1.7: 有永久代，但已经逐步"去永久代"，字符串常量池、静态变量移除，保存在堆中。
    3. jdk1.8及以后: 无永久代，类型信息、字段、方法、常量保存在本地内存的元空间，但字符串常量池、静态变量仍在堆。
-3. <img src="JVM.Images.I/第09章_方法区的演进细节-hotspot.jpg">
+3. <img src="JVMPart1.Images/第09章_方法区的演进细节-hotspot.jpg">
    1 在JDK7的时候，把静态常量和StringTable放到的堆中。
    2. 在JDK8的时候，放方法区移出虚拟机内存，直接使用本地内存，此时方法区就不受虚拟机内存的限制了。
 
@@ -227,7 +227,7 @@ JDK7中将StringTable放到了堆空间中。因为永久代的回收效率很�
 
 
 ## 9.8 总结
-<img src="JVM.Images.I/第09章_小结.jpg">
+<img src="JVMPart1.Images/第09章_小结.jpg">
 
 
 ## Reference

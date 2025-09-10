@@ -6,7 +6,7 @@ JVM内存布局规定了Java在运行过程中内存申请、分配、管理的�
 **不同JVM对内存的划分方式和管理机制存在着部分差异。**
 * 我们通过磁盘或网络IO得到的数据，都需要先加载到**内存中**，然后CPU从内存中读取数据，也就是说内存充当了CPU和硬盘之间的桥梁。
 
-<img src="JVM.Images.I/第02章_JVM架构-简图.jpg">
+<img src="JVMPart1.Images/第02章_JVM架构-简图.jpg">
 
 * Method Area 在 JDK8 及以后改称元空间(Metadata space)，使用的是本地内存。
 
@@ -24,7 +24,7 @@ HotSpot的经典运行时数据区的内存布局(HotSpot JVM)
 
 Java虚拟机定义了若干种程序运行期间会使用到的运行时数据区。其中有一些会伴随着虚拟机启动而创建，随着虚拟机退出而销毁。另一些则是与线程一一对应，这些与线程对应的数据区域会伴随着线程开始和结束而创建和销毁。
 
-<img src="JVM.Images.I/第03章_线程共享和私有的结构.jpg">
+<img src="JVMPart1.Images/第03章_线程共享和私有的结构.jpg">
 
 灰色的为单独线程私有的，红色的为多个线程共享的。即：
 * 每个线程：独立包括程序计数器、栈、本地栈。
@@ -36,7 +36,7 @@ Java虚拟机定义了若干种程序运行期间会使用到的运行时数据�
 
 **关于线程间共享的说明:**
 
-<img src="JVM.Images.I/第03章_Runtime.png">
+<img src="JVMPart1.Images/第03章_Runtime.png">
 
 每个 JVM 实例只有一个`Runtime`实例(单例模式)，即为运行时环境，相当于内存结构中间那个框: 运行时环境(Runtime Data Area)。
 * 一个JVM实例对应着一个Runtime实例
@@ -55,7 +55,7 @@ From JDK8 doc
   * 守护线程，用户线程。如果程序中只剩下守护线程，其实 JVM 就可以退出了。
 * 操作系统负责所有线程的安排调度到任何一个可用的CPU上。一旦本地线程初始化成功，它就会调用Java线程中的`run()`方法。
 
-<img src="JVM.Images.I/第03章_Thread.png">
+<img src="JVMPart1.Images/第03章_Thread.png">
 
 * [JDK8: java.lang.Thread](https://docs.oracle.com/javase/8/docs/api/)
 

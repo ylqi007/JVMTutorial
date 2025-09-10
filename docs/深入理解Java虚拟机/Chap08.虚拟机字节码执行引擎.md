@@ -15,7 +15,7 @@ Java虚拟机以**方法**作为最基本的执行单元，"**栈帧**"(Stack Fr
 * 上图整体是**虚拟机运行时数据区(Runtime Data Area)**，包含5个部分。
 * 右下角是**虚拟机栈(Java Virtual Machine Stack)**，
 
-<img src="../JVM.Images.I/第03章_JVM_运行时数据区.png">
+<img src="../JVMPart1.Images/第03章_JVM_运行时数据区.png">
 
 **每一个栈帧**的包括了
 1. 局部变量表

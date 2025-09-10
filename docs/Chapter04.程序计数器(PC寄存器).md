@@ -5,7 +5,7 @@ From [JDK8 The Java® Virtual Machine Specification ](https://docs.oracle.com/ja
 
 
 ## 1. PC Register介绍
-<img src="JVM.Images.I/第04章_PC寄存器.jpeg">
+<img src="JVMPart1.Images/第04章_PC寄存器.jpeg">
 
 * Stack Area是不考虑垃圾回收的，只有入栈，出栈操作，没有垃圾回收。但是有可能会溢出，即发生OOM
 * PC registers也没有垃圾回收，只是不断被替换成下一个地址。不会发生OOM
@@ -17,7 +17,7 @@ JVM中的程序计数寄存器(Program Counter Register)中，Register的命名�
 
 **作用:** PC寄存器用来存储指向下一条指令的地址，也即将要执行的指令代码。由执行引擎读取下一条指令。
 
-<img src="JVM.Images.I/第04章_PC寄存器作用.png">
+<img src="JVMPart1.Images/第04章_PC寄存器作用.png">
 
 **PC Register介绍:**
 * 它是一块很小的内存空间，几乎可以忽略不计。也是运行速度最快的存储区域。
@@ -119,7 +119,7 @@ SourceFile: "PCRegisterTest.java"
 * `Code` 部份的第一列就是指令地址(偏移地址)，就存放于 PC register中
 * `Code` 部份的第二列就是操作指令(比如`bipush`, `istore_1`, etc)
 
-<img src="JVM.Images.I/第04章_PC寄存器_举例.png">
+<img src="JVMPart1.Images/第04章_PC寄存器_举例.png">
 
 * PC寄存器中保存着指向"操作指令"(i.e. `iload_2`)的"指令地址"(i.e. `5`)。
 * 执行引擎会取出对应的操作指令，然后做两件事

@@ -94,16 +94,16 @@ Sets the thread stack size (in bytes). Append the letter k or K to indicate KB, 
 * 如果当前方法调用了其他方法，方法返回之际，当前栈帧会传回此方法的执行结果给前一个栈帧，接着，虚拟机会丢弃当前栈帧，使得前一个栈帧重新成为当前栈帧。
 * Java方法有两种返回函数的方式，一种是正常的函数返回，使用return指令；另外一种是抛出异常。不管使用哪种方式，都会导致栈帧被弹出。
 
-<img src="JVM.Images.I/第05章_方法与栈桢.jpg">
+<img src="JVMPart1.Images/第05章_方法与栈桢.jpg">
 
-<img src="JVM.Images.I/第05章_方法_栈帧_栈桢内部结构.jpg">
+<img src="JVMPart1.Images/第05章_方法_栈帧_栈桢内部结构.jpg">
 
-<img src="JVM.Images.I/第05章_StackFrameTest.png">
+<img src="JVMPart1.Images/第05章_StackFrameTest.png">
 
 
 ### 2.3 栈帧的内部结构
-<img src="JVM.Images.I/第05章_运行时数据区_栈帧.webp">
-<img src="JVM.Images.I/第05章_栈帧内部结构.png">
+<img src="JVMPart1.Images/第05章_运行时数据区_栈帧.webp">
+<img src="JVMPart1.Images/第05章_栈帧内部结构.png">
 
 每个栈帧中存储着:
 1. 局部变量表(Local Variables)
@@ -129,12 +129,12 @@ Sets the thread stack size (in bytes). Append the letter k or K to indicate KB, 
 
 
 #### 1. 局部变量表结构的认识+内部剖析
-<img src="JVM.Images.I/第05章_局部变量表_main_0.png">
-<img src="JVM.Images.I/第05章_局部变量表_main_1.png">
-<img src="JVM.Images.I/第05章_局部变量表_main_2.png">
-<img src="JVM.Images.I/第05章_局部变量表_main_3.png">
-<img src="JVM.Images.I/第05章_局部变量表_main_4.png">
-<img src="JVM.Images.I/第05章_局部变量表_main_5.png">
+<img src="JVMPart1.Images/第05章_局部变量表_main_0.png">
+<img src="JVMPart1.Images/第05章_局部变量表_main_1.png">
+<img src="JVMPart1.Images/第05章_局部变量表_main_2.png">
+<img src="JVMPart1.Images/第05章_局部变量表_main_3.png">
+<img src="JVMPart1.Images/第05章_局部变量表_main_4.png">
+<img src="JVMPart1.Images/第05章_局部变量表_main_5.png">
 
 
 ### 3.2 变量槽slot的理解与演示
@@ -149,16 +149,16 @@ Sets the thread stack size (in bytes). Append the letter k or K to indicate KB, 
 * 当一个实例方法被调用的时候，它的方法参数和方法体内部定义的局部变量都会按照顺序被赋值到局部变量表中的每一个slot上。
 * 如果需要访问局部变量表中的一个64bit的局部变量值时，只需要使用前一个索引即可。(比如，访问long或double类型变量)
 * 如果当前帧是由构造方法或者是实例方法创建的，那么该对象引用thi将会存放在index为0的slot为0的slot处，其余的参数按照参数表顺序继续排列。
-* <img src="JVM.Images.I/第05章_局部变量表_slot_1.png">
-* <img src="JVM.Images.I/第05章_局部变量表_slot_2.png">
-* <img src="JVM.Images.I/第05章_局部变量表_slot_4.png">
+* <img src="JVMPart1.Images/第05章_局部变量表_slot_1.png">
+* <img src="JVMPart1.Images/第05章_局部变量表_slot_2.png">
+* <img src="JVMPart1.Images/第05章_局部变量表_slot_4.png">
 
 
 #### 1. Slot的重复利用
 * 栈帧中的局部变量表中的槽位是可以重复用的，如果一个局部变量表过了其作用域，那么在其作用域之后申明的新的局部变量就很有可能会复用过期的局部变量的槽位，从而达到节省资源的目的。
 * `com.atguigu.LocalVariablesTest.test4`
 * [Demo05LocalVariablesTest.java](../JVMPart1/src/main/java/com/ylqi007/chap05stack/Demo05LocalVariablesTest.java) `test4()`
-* <img src="JVM.Images.I/第05章_局部变量表_slot_3.png">
+* <img src="JVMPart1.Images/第05章_局部变量表_slot_3.png">
 
 
 #### 2. 举例: 静态变量与局部变量的对比
@@ -221,13 +221,13 @@ public class OperandStackTest {
     }
 }
 ```
-* <img src="JVM.Images.I/第05章_局部变量表_操作数栈_1.png">
-* <img src="JVM.Images.I/第05章_局部变量表_操作数栈_2.png">
-* <img src="JVM.Images.I/第05章_局部变量表_操作数栈_3.png">
+* <img src="JVMPart1.Images/第05章_局部变量表_操作数栈_1.png">
+* <img src="JVMPart1.Images/第05章_局部变量表_操作数栈_2.png">
+* <img src="JVMPart1.Images/第05章_局部变量表_操作数栈_3.png">
 
 
 ### 1. 一个追踪操作数栈的例子
-* <img src="JVM.Images.I/第05章_局部变量表_操作数栈_代码追踪.png">
+* <img src="JVMPart1.Images/第05章_局部变量表_操作数栈_代码追踪.png">
 
 当开始执行一个Java方式时，首先线程会创建该方法的栈帧，栈帧创建**空的操作数栈和局部变量表**，执行过程中，会有各种指令往操作数栈中写入和读取内容，也就是出栈和入栈操作。
 1. 执行偏移地址为0的iconst指令(i.e. `iconst_2`)，后面2是跟随的整形常量值2，执行后，2进入操作数栈栈顶。
@@ -260,7 +260,7 @@ public class OperandStackTest {
 
 
 ## 7. 动态链接(Dynamic Linking)(或指向运行时常量池的方法引用)
-<img src="JVM.Images.I/第05章_方法_栈帧_栈桢内部结构.jpg">
+<img src="JVMPart1.Images/第05章_方法_栈帧_栈桢内部结构.jpg">
 注: 有些书上也会将动态链接，方法返回地址，和一些附加信息统称为"帧数据区"。
 
 **动态链接(Dynamic Linking)(或指向运行时常量池的方法引用):**
@@ -274,9 +274,9 @@ public class OperandStackTest {
 * 字节码中的常量池信息(Constant pool)会在加载的时候被加载到方法区，也就是上图中的运行时常量区。
 * 一个类的class文件会被加载到Method Area，其中包括类型信息，域信息，方法信息，和运行时常量池等。
 
-<img src="JVM.Images.I/第05章_动态链接_常量池_1.png">
-<img src="JVM.Images.I/第05章_动态链接_常量池_2.png">
-<img src="JVM.Images.I/第05章_动态链接_常量池_3.png">
+<img src="JVMPart1.Images/第05章_动态链接_常量池_1.png">
+<img src="JVMPart1.Images/第05章_动态链接_常量池_2.png">
+<img src="JVMPart1.Images/第05章_动态链接_常量池_3.png">
 
 描述一个方法调用了另外一个方法时，就是通过常量池中指向方法的符号引用来表示，那么动态链接的作用就是为了将这些**符号引用**转换为调用方法的直接引用。
 * 在图1中, `methodB()`调用了`methodA()`。在字节码中，符号链接`#7`就是指向常量池中的方法引用。
@@ -299,10 +299,10 @@ class文件中存在一个常量池表(Constant Pool Table)，存了编译后各
 * **早期绑定:** 早期绑定就是指被调用的目标方法如果在编译期可知，且运行期间保持不变时，即可将这个方法与所属类型进行绑定，这样一来，由于明确了被调用的目标方法究竟是哪一个，因此也就可以使用静态链接的方式将符号引用转换为直接引用。
 * **晚期绑定:** 如果被调用的方法在编译期间无法被确定下来，只能够在程序运行期间根据时间的类型绑定相关的方法，这种绑定方式也就被称之为晚期绑定。
 
-<img src="JVM.Images.I/第05章_方法调用_早期绑定_1.png">
-<img src="JVM.Images.I/第05章_方法调用_早期绑定_2.png">
-<img src="JVM.Images.I/第05章_方法调用_晚期绑定_1.png">
-<img src="JVM.Images.I/第05章_方法调用_晚期绑定_2.png">
+<img src="JVMPart1.Images/第05章_方法调用_早期绑定_1.png">
+<img src="JVMPart1.Images/第05章_方法调用_早期绑定_2.png">
+<img src="JVMPart1.Images/第05章_方法调用_晚期绑定_1.png">
+<img src="JVMPart1.Images/第05章_方法调用_晚期绑定_2.png">
 
 随着高级语言的横空出世，类似于Java一样的面向与对象的编程语言如今是越来越多，尽管这类编程语言在语法风格上存在一定的差别，但是它们彼此之间始终保持着一个共性，那就是都支持封装、继承和多态等面向对象的特性，既然这一类的编程语言具备多态特性，那么自然也就具备了早期绑定和晚期绑定两种方式。
 
@@ -339,7 +339,7 @@ Java中任何一个普通的方法其实都具备虚函数的特征，它们相�
 **分配调用:**
 * 解析调用是针对编译期间确定调用版本的方法，像实现Java语言多态特性的方法重载和方法重写就会存在多个方法版本，为了筛选目标方法的调用版本，就出现了分派调用方式，分派调用不仅含有静态，也含有动态。
 
-<img src="JVM.Images.I/第05章_方法调用_虚_非虚方法_1.png">
+<img src="JVMPart1.Images/第05章_方法调用_虚_非虚方法_1.png">
 
 ### 8.4 方法调用: 关于`invokedynamic`指令
 * JVM字节码指令集一直比较稳定，一直到Java7中才增加了一个`invokedynamic`指令，这是Java为了实现"动态类型语言"支持而做的一种改进。
@@ -378,7 +378,7 @@ Java语言中方法重写(`@Override`)的本质:
 * 虚方法表中存放着各个方法的实际入口地址，如果某个方法在子类没有被重写，那么该方法在子类和父类的虚方法表中的实际入口地址是一样的，都指向父类的入口，如果重写了，子类虚方法表的地址就会被替换为重写的方法入口地址。
 * 那么虚方法表什么时候被创建？虚方法表会在类加载的链接阶段被创建并开始初始化，类的变量初始值准备完成之后，JVM会把该类的方法表也初始化完毕。
 
-<img src="JVM.Images.I/第05章_方法调用_虚方法表.png">
+<img src="JVMPart1.Images/第05章_方法调用_虚方法表.png">
 
 * `Son`类重写了`Father`的全部方法，所以`Son`类的方法没有指向`Father`的类型数据(方法的直接引用存于方法区类型数据中)
 * `Son`和`Father`都没有重写`Object`的方法，所以虚方法表中没有个重写的方法都指向了`Object`的类型数据。

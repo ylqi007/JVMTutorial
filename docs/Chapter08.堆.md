@@ -1,7 +1,7 @@
 # Chapter08 堆(Heap)
 
 ## 8.1 堆(heap)的核心概述
-<img src="JVM.Images.I/第02章_JVM架构-简图.jpg">
+<img src="JVMPart1.Images/第02章_JVM架构-简图.jpg">
 
 * 红色的**方法区**(Method Area)和**堆**(Heap)对于一个**进程**而言，都是唯一的，也就是线程共享。一个进程对应一个 JVM 实例(`java.lang.Runtime`)。
 * 灰色的**程序计数器**，**本地方法栈**和**Java虚拟机栈**是每个线程各有一份。
@@ -18,13 +18,13 @@
 * 在方法结束后，堆中的对象不会马上被移除，仅仅在垃圾收集的时候才会被移除。
 * ✅ **堆，是GC(Garbage Collection, 垃圾收集器)执行垃圾回收的重点区域**。
 
-<img src="JVM.Images.I/第02章_JVM架构-简图.jpg">
+<img src="JVMPart1.Images/第02章_JVM架构-简图.jpg">
 
 * **栈**负责运行，解决程序的运行问题，即如何运行，或者说如何处理数据
 * **堆**负责存储，解决的是数据存储的问题，即数据怎么放，放哪里
 * 方法区
 
-<img src="JVM.Images.I/第08章_VMStack_Heap_MethodArea.png">
+<img src="JVMPart1.Images/第08章_VMStack_Heap_MethodArea.png">
 
 ### 8.1.1 堆的核心概述: 内存细分
 现代垃圾回收器大部分都基于分代收集理论设计，堆空间细分为:
@@ -63,7 +63,7 @@ Example: `com.atguigu.java.HeapDemo`
   * 初始内存大小: 物理内存大小/64
   * 最大内存大小: 物理内存大小/4
 
-<img src="JVM.Images.I/第08章_OOMTest.png">
+<img src="JVMPart1.Images/第08章_OOMTest.png">
 
 
 ## 8.3 年轻代与老年代
@@ -72,7 +72,7 @@ Example: `com.atguigu.java.HeapDemo`
   * 另一类对象的生命周期却非常长，在某些极端的情况下还能够与JVM的生命周期保持一致。
 * **Java堆区**进一步细分的话，可以划分为**年轻代(YoungGen)**和**老年代(OldGen)**。
 * 其中年轻代又可以划分为Eden空间、Survivor0空间和Survivor1空间(有时也叫做from区和to区)
-* <img src="JVM.Images.I/第08章_堆空间细节.jpg">
+* <img src="JVMPart1.Images/第08章_堆空间细节.jpg">
 * 1. 伊甸区(Eden): 存放大部分新创建对象。
   2. 幸存区(Survivor): 存放Minor GC之后，Eden区和幸存区(Survivor)本身没有被回收的对象。
   3. 老年区: 存放Minor GC之后且年龄计算器达到15依然存活的对象、Major GC和Full GC之后仍然存活的对象。
@@ -88,11 +88,11 @@ Example: `com.atguigu.java.HeapDemo`
 1. 配置新生代与老年代在堆结构中的占比:
    * 默认`-XX:NewRatio=2`，表示新生代占1，老年代占2，新生代占整个堆的1/3
    * 可以修改`-XX:NewRatio=4`，表示新生代占1，老年代占4，新生代占整个堆的1/5
-   * <img src="JVM.Images.I/第08章_YoungOldRatio_1.png">
+   * <img src="JVMPart1.Images/第08章_YoungOldRatio_1.png">
 2. 配置Eden空间和另外两个Survivor空间所占比例
    * 默认是`-XX:SurvivorRatio=8`
-   * <img src="JVM.Images.I/第08章_SurvivorRatio_0.png">
-   * <img src="JVM.Images.I/第08章_SurvivorRatio_1.png">
+   * <img src="JVMPart1.Images/第08章_SurvivorRatio_0.png">
+   * <img src="JVMPart1.Images/第08章_SurvivorRatio_1.png">
 
 可以通过CLI查看`NewRatio`
 ```shell
@@ -124,7 +124,7 @@ Example: `com.atguigu.java.HeapDemo`
 
 1. new的对象先放在伊甸园区(Eden)。此区有大小限制。
 2. 当伊甸园区空间填满时，程序有需要创建对象，JVM的垃圾回收器将对伊甸园区进行垃圾回收(Minor GC)，将Eden区中不在被其他对象所引用的对象进行销毁。再加载新的对象放到Eden区。
-   * <img src="JVM.Images.I/第08章_新生代对象分配与回收过程.jpg">
+   * <img src="JVMPart1.Images/第08章_新生代对象分配与回收过程.jpg">
 3. 然后将Eden区中的剩余对象移动到Survivor0区。
 4. 如果再次触发垃圾回收，此时上次幸存下来的放到Survivor0区的，如果没有被回收，就会放到Survivor1区。
 5. 如果再次经历垃圾回收，此时会重新放回Survivor0区，接着再去Survivor1区。
@@ -141,8 +141,8 @@ Example: `com.atguigu.java.HeapDemo`
 * https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html (-XX:NewRatio=ratio)
 
 ### 8.4.2 对象分配的特殊情况
-<img src="JVM.Images.I/第08章_Java对象内存分配.png">
-<img src="JVM.Images.I/第08章_对象分配过程_JVisualVM.png">
+<img src="JVMPart1.Images/第08章_Java对象内存分配.png">
+<img src="JVMPart1.Images/第08章_对象分配过程_JVisualVM.png">
 
 **内存溢出:** 当JVM无法申请到足够内存给堆空间或者没有足够的空间存储当前堆中的对象，就会出现`java.lang.OutOfMemoryError`。
 
@@ -156,7 +156,7 @@ Example: `com.atguigu.java.HeapDemo`
 * GCViewer
 * GC Easy
 
-<img src="JVM.Images.I/第08章_常用调优工具_Jprofiler.png">
+<img src="JVMPart1.Images/第08章_常用调优工具_Jprofiler.png">
 
 
 ## 8.5 Minor GC, Major GC, Full GC
@@ -263,7 +263,7 @@ Minor GC example: `[GC (Allocation Failure) [PSYoungGen: 2048K->512K(2560K)] 204
 -XX:+UseTLAB
 ```
 
-<img src="JVM.Images.I/第08章_对象分配过程.jpg">
+<img src="JVMPart1.Images/第08章_对象分配过程.jpg">
 
 
 ## 8.9 小结堆空间的参数设置

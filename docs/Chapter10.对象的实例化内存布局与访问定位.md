@@ -1,7 +1,7 @@
 # Chapter10 对象的实例化内存布局与访问定位
 
 ## 10.1 对象的实例化
-<img src="JVM.Images.I/第10章_对象的实例化.jpg">
+<img src="JVMPart1.Images/第10章_对象的实例化.jpg">
 
 ### 10.1.1 对象创建的方式
 #### 1. new: 通过构造器 
@@ -55,7 +55,7 @@ JVM遇到一条new指令时，首先去检查这个指令的参数能否在Metas
 
 
 ## 10.2 对象的内存布局
-<img src="JVM.Images.I/第10章_对象的内存布局.jpg">
+<img src="JVMPart1.Images/第10章_对象的内存布局.jpg">
 
 #### 1. 对象头(Header)
 1. 运行时元数据: 
@@ -80,18 +80,18 @@ JVM遇到一条new指令时，首先去检查这个指令的参数能否在Metas
 不是必须的，也没有特别的含义，仅仅起到占位符的作用。
 
 #### 4. 小结
-<img src="JVM.Images.I/第10章_图示对象的内存布局.jpg">
+<img src="JVMPart1.Images/第10章_图示对象的内存布局.jpg">
 
 
 ## 10.3 对象的访问定位
 JVM是如何通过栈帧中的对象引用访问到其内部的对象实例的？
 
-<img src="JVM.Images.I/第10章_对象访问定位.jpg">
+<img src="JVMPart1.Images/第10章_对象访问定位.jpg">
 
-<img src="JVM.Images.I/第10章_对象的访问定位_1.png">
+<img src="JVMPart1.Images/第10章_对象的访问定位_1.png">
 
 对象访问的方式主要有两种
 1. 句柄访问
-   1. <img src="JVM.Images.I/第10章_方式1：句柄访问.jpg">
+   1. <img src="JVMPart1.Images/第10章_方式1：句柄访问.jpg">
 2. 直接指针(HotSpot采用)
-   1. <img src="JVM.Images.I/第10章_方式2：使用直接指针访问.jpg">
+   1. <img src="JVMPart1.Images/第10章_方式2：使用直接指针访问.jpg">

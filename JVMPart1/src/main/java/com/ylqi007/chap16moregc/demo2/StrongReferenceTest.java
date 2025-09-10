@@ -1,4 +1,4 @@
-package com.atguigu.java1;
+package com.ylqi007.chap16moregc.java1;
 
 /**
  *  强引用的测试

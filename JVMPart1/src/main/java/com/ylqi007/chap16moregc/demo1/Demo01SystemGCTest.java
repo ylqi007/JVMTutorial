@@ -1,4 +1,4 @@
-package com.atguigu.java;
+package com.ylqi007.chap16moregc.demo1;
 
 /**
  * Description:

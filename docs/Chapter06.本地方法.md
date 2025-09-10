@@ -12,7 +12,7 @@
 
 **本地接口**的作用是融合不同编程语言为Java所用，它的初衷是融合C/C++程序。
 
-<img src="JVM.Images.I/第06章_本地方法_Native_Method.png">
+<img src="JVMPart1.Images/第06章_本地方法_Native_Method.png">
 
 * `java.lang.Object.getClass`: `public final native Class<?> getClass();`
   * 看似没有方法体，实际上是有的，不过方法体的具体实现是C/C++
@@ -49,7 +49,7 @@ Java使用起来非常方便，然而有些层次的任务用Java实现起来并
 * 在HotSpot JVM中，直接将本地方法栈和虚拟机栈合二为一。
 
 
-<img src="JVM.Images.I/第06章_本地方法栈_NativeMethodStack.png">
+<img src="JVMPart1.Images/第06章_本地方法栈_NativeMethodStack.png">
 
 
 ## Reference
